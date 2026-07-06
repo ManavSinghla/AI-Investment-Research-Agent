@@ -39,7 +39,7 @@ export default function DashboardView({ query, verdict, error, dimensions = {}, 
         <div className="font-display-lg text-headline-md tracking-tighter text-primary">AlphaLens</div>
         <div className="flex items-center space-x-8">
           <span className="text-outline font-label-caps text-label-caps">{query}</span>
-          <span className="text-outline font-label-caps text-label-caps opacity-50">STAGE VIII : VERDICT</span>
+          <span className="text-outline font-label-caps text-label-caps opacity-50">VERDICT</span>
           <button className="text-primary hover:opacity-80 transition-opacity" onClick={onClose}>
             <span className="material-symbols-outlined">close</span>
           </button>
