@@ -21,6 +21,36 @@ export default function DashboardView({ query, verdict, error, dimensions = {}, 
   const signalText = isInvest ? 'BUY SIGNAL' : isWatch ? 'HOLD SIGNAL' : 'PASS SIGNAL';
   const verdictText = verdict.verdict.toUpperCase();
 
+  const colorClass = isInvest 
+    ? 'text-emerald-400' 
+    : isWatch 
+      ? 'text-amber-400' 
+      : 'text-red-400';
+
+  const glowStyle = isInvest 
+    ? { textShadow: '0 0 25px rgba(52, 211, 153, 0.4)' } 
+    : isWatch 
+      ? { textShadow: '0 0 25px rgba(251, 191, 36, 0.4)' } 
+      : { textShadow: '0 0 25px rgba(248, 113, 113, 0.4)' };
+
+  const bgBorderClass = isInvest
+    ? 'border-emerald-500/20 bg-emerald-500/5'
+    : isWatch
+      ? 'border-amber-500/20 bg-amber-500/5'
+      : 'border-red-500/20 bg-red-500/5';
+
+  const dotClass = isInvest
+    ? 'bg-emerald-400'
+    : isWatch
+      ? 'bg-amber-400'
+      : 'bg-red-400';
+
+  const confidenceColorClass = verdict.confidence?.toLowerCase() === 'high'
+    ? 'text-emerald-400'
+    : verdict.confidence?.toLowerCase() === 'medium'
+      ? 'text-amber-400'
+      : 'text-red-400';
+
   const tabs = [
     { id: 'verdict', label: 'Verdict', icon: 'gavel' },
     { id: 'financials', label: 'Financials', icon: 'account_balance' },
@@ -71,25 +101,27 @@ export default function DashboardView({ query, verdict, error, dimensions = {}, 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
               <div className="lg:col-span-7 space-y-12">
                 <div className="space-y-4">
-                  <div className="inline-flex items-center space-x-2 border border-white/10 px-3 py-1 rounded-full">
-                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" style={{ boxShadow: '0 0 20px rgba(255,255,255,0.05)' }}></div>
+                  <div className={`inline-flex items-center space-x-2 border ${isInvest ? 'border-emerald-500/20' : isWatch ? 'border-amber-500/20' : 'border-red-500/20'} px-3 py-1 rounded-full`}>
+                    <div className={`w-2 h-2 rounded-full ${dotClass} animate-pulse`} style={{ boxShadow: isInvest ? '0 0 20px rgba(52, 211, 153, 0.5)' : isWatch ? '0 0 20px rgba(251, 191, 36, 0.5)' : '0 0 20px rgba(248, 113, 113, 0.5)' }}></div>
                     <span className="font-label-caps text-label-caps text-on-surface">SYNTHESIS COMPLETE</span>
                   </div>
-                  <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-primary leading-tight uppercase">
-                    {signalText}: <br/>
-                    <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">{verdictText}</span>
+                  <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg leading-tight uppercase">
+                    <span className="text-on-surface-variant opacity-60">{signalText}:</span> <br/>
+                    <span className={`${colorClass}`} style={glowStyle}>{verdictText}</span>
                   </h1>
                 </div>
 
-                <div className="bg-white/5 backdrop-blur-[32px] border-[0.5px] border-white/10 p-8 rounded-lg relative overflow-hidden">
+                <div className={`backdrop-blur-[32px] border-[0.5px] p-8 rounded-lg relative overflow-hidden ${bgBorderClass}`}>
                   <div className="absolute top-0 right-0 p-8 opacity-10">
-                    <span className="material-symbols-outlined text-[120px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                    <span className={`material-symbols-outlined text-[120px] ${colorClass}`} style={{ fontVariationSettings: "'FILL' 1" }}>
+                      {isInvest ? 'verified' : isWatch ? 'visibility' : 'cancel'}
+                    </span>
                   </div>
                   <div className="relative z-10 space-y-6">
                     <div className="flex items-baseline space-x-4">
-                      <span className="font-display-lg text-[40px] text-primary leading-none uppercase">{verdict.confidence} CONFIDENCE</span>
+                      <span className={`font-display-lg text-[40px] leading-none uppercase ${confidenceColorClass}`}>{verdict.confidence} CONFIDENCE</span>
                     </div>
-                    <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                    <p className="font-body-lg text-body-lg text-white max-w-2xl leading-relaxed">
                       AI Executive Summary: {verdict.summary}
                     </p>
                   </div>
@@ -111,31 +143,31 @@ export default function DashboardView({ query, verdict, error, dimensions = {}, 
               </div>
 
               <div className="lg:col-span-5 space-y-gutter mt-12 lg:mt-0">
-                <div className="bg-white/5 backdrop-blur-[32px] border-[0.5px] border-white/10 p-6 border-l-4 border-l-white">
-                  <div className="font-label-caps text-label-caps text-on-surface-variant mb-4 flex justify-between items-center">
+                <div className="bg-white/5 backdrop-blur-[32px] border-[0.5px] border-white/10 p-6 border-l-4 border-l-emerald-400">
+                  <div className="font-label-caps text-label-caps text-emerald-400 mb-4 flex justify-between items-center">
                     <span>SUPPORTING FACTORS</span>
                     <span className="material-symbols-outlined text-[16px]">trending_up</span>
                   </div>
                   <ul className="space-y-4">
                     {verdict.supporting_factors.map((factor, idx) => (
                       <li key={idx} className="font-body-md text-body-md text-on-surface flex items-start space-x-3">
-                        <span className="mt-1 w-1.5 h-1.5 bg-white rounded-full flex-shrink-0"></span>
-                        <span className="opacity-80">{factor}</span>
+                        <span className="mt-1.5 w-1.5 h-1.5 bg-emerald-400 rounded-full flex-shrink-0"></span>
+                        <span className="opacity-90">{factor}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="bg-white/5 backdrop-blur-[32px] border-[0.5px] border-white/10 p-6 border-l-4 border-l-error">
-                  <div className="font-label-caps text-label-caps text-on-surface-variant mb-4 flex justify-between items-center">
+                <div className="bg-white/5 backdrop-blur-[32px] border-[0.5px] border-white/10 p-6 border-l-4 border-l-red-400">
+                  <div className="font-label-caps text-label-caps text-red-400 mb-4 flex justify-between items-center">
                     <span>RISK FACTORS</span>
                     <span className="material-symbols-outlined text-[16px]">warning</span>
                   </div>
                   <ul className="space-y-4">
                     {verdict.risk_factors.map((factor, idx) => (
                       <li key={idx} className="font-body-md text-body-md text-on-surface flex items-start space-x-3">
-                        <span className="mt-1 w-1.5 h-1.5 bg-error rounded-full flex-shrink-0"></span>
-                        <span className="opacity-80">{factor}</span>
+                        <span className="mt-1.5 w-1.5 h-1.5 bg-red-400 rounded-full flex-shrink-0"></span>
+                        <span className="opacity-90">{factor}</span>
                       </li>
                     ))}
                   </ul>

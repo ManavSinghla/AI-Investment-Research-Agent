@@ -138,9 +138,23 @@ export default function LandingView({ query, onQueryChange, isSearching, onSearc
                       <div className="text-white font-headline-md text-sm group-hover:text-primary transition-colors">{item.query}</div>
                       <div className="text-on-surface-variant text-xs mt-1">{new Date(item.date).toLocaleDateString()}</div>
                     </div>
-                    <div className={`px-2.5 py-1 rounded font-label-caps text-[10px] uppercase tracking-widest ${item.verdict?.decision === 'INVEST' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
-                      {item.verdict?.decision || 'UNKNOWN'}
-                    </div>
+                    {(() => {
+                      const verdictVal = item.verdict?.verdict?.toUpperCase() || 'UNKNOWN';
+                      const isInvest = verdictVal === 'INVEST' || verdictVal === 'BUY';
+                      const isWatch = verdictVal === 'WATCH' || verdictVal === 'HOLD';
+                      
+                      const badgeClass = isInvest
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : isWatch
+                          ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                          : 'bg-red-500/10 text-red-400 border border-red-500/20';
+
+                      return (
+                        <div className={`px-2.5 py-1 rounded font-label-caps text-[10px] uppercase tracking-widest ${badgeClass}`}>
+                          {verdictVal}
+                        </div>
+                      );
+                    })()}
                   </button>
                 ))}
               </div>
