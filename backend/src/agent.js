@@ -4,7 +4,11 @@ import { fetchFinancials, searchDuckDuckGo } from "./tools.js";
 import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 import dotenv from "dotenv";
 
-dotenv.config({ path: '../.env' });
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 // Define the State
 export const GraphState = Annotation.Root({
@@ -23,7 +27,7 @@ export const GraphState = Annotation.Root({
 
 const getModel = () => {
   return new ChatGoogleGenerativeAI({
-    modelName: "gemini-1.5-pro",
+    model: "gemini-flash-latest",
     maxOutputTokens: 2048,
     apiKey: process.env.GOOGLE_GENAI_API_KEY || process.env.GOOGLE_API_KEY,
   });
