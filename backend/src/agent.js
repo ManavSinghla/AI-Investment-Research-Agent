@@ -1,6 +1,6 @@
 import { StateGraph, START, END, Annotation } from "@langchain/langgraph";
 import { ChatGroq } from "@langchain/groq";
-import { fetchFinancials, searchDuckDuckGo } from "./tools.js";
+import { fetchFinancials, searchDuckDuckGo, fetchYahooNews } from "./tools.js";
 import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 import dotenv from "dotenv";
 
@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 // Define the State
 export const GraphState = Annotation.Root({
@@ -110,11 +111,25 @@ async function financialsNode(state, config) {
 async function newsNode(state, config) {
   config?.configurable?.onProgress?.(`Fetching recent news and sentiment for ${state.companyInfo.name}...`, "fetchNewsNode");
   const model = getModel();
-  const query = `${state.companyInfo.name} recent news financial`;
-  const result = await searchDuckDuckGo(query, 5);
+  
+  let newsData = [];
+  if (state.companyInfo.ticker) {
+    const yahooNews = await fetchYahooNews(state.companyInfo.ticker, 5);
+    if (yahooNews.success && yahooNews.data?.length > 0) {
+      newsData = yahooNews.data;
+    }
+  }
+  
+  if (newsData.length === 0) {
+    const query = `${state.companyInfo.name} recent news financial`;
+    const ddgNews = await searchDuckDuckGo(query, 5);
+    if (ddgNews.success) {
+      newsData = ddgNews.data || [];
+    }
+  }
   
   const prompt = `Based on the following recent news for ${state.companyInfo.name}:
-${JSON.stringify(result.data || [])}
+${JSON.stringify(newsData)}
 
 Analyze the overall market sentiment. Return a strict JSON object with:
 "score": A number from 0 to 100 where 0 is extremely negative, 50 is neutral, and 100 is extremely positive.
@@ -134,7 +149,7 @@ Analyze the overall market sentiment. Return a strict JSON object with:
   }
 
   return {
-    news: { sentiment, sources: result.data },
+    news: { sentiment, sources: newsData },
     logs: [`Analyzed recent news and sentiment for ${state.companyInfo.name}.`]
   };
 }
@@ -142,18 +157,21 @@ Analyze the overall market sentiment. Return a strict JSON object with:
 async function competitorsNode(state, config) {
   config?.configurable?.onProgress?.(`Analyzing competitors for ${state.companyInfo.name}...`, "fetchCompetitorsNode");
   const model = getModel();
-  // First, search for competitors
+  
   const query = `${state.companyInfo.name} main competitors market share`;
   const searchResult = await searchDuckDuckGo(query, 5);
+  const dataExists = searchResult.success && searchResult.data && searchResult.data.length > 0;
   
-  const prompt = `Based on the following search results about ${state.companyInfo.name}'s competitors:
-${JSON.stringify(searchResult.data || [])}
+  const prompt = dataExists 
+    ? `Based on the following search results about ${state.companyInfo.name}'s competitors:
+${JSON.stringify(searchResult.data)}
 
-Summarize their competitive position in 2-3 sentences and list 2-3 main competitors.`;
+Summarize their competitive position in 2-3 sentences and list 2-3 main competitors.`
+    : `Using your general knowledge about ${state.companyInfo.name} (sector: ${state.companyInfo.sector || 'Unknown'}), summarize their competitive position in the industry in 2-3 sentences and list 2-3 of their primary competitors.`;
 
   const res = await invokeWithRetry(model, [new HumanMessage(prompt)]);
   return {
-    competitors: { summary: res.content, sources: searchResult.data },
+    competitors: { summary: res.content, sources: dataExists ? searchResult.data : [] },
     logs: [`Analyzed competitive position for ${state.companyInfo.name}.`]
   };
 }
@@ -161,17 +179,21 @@ Summarize their competitive position in 2-3 sentences and list 2-3 main competit
 async function risksNode(state, config) {
   config?.configurable?.onProgress?.(`Scanning risk factors for ${state.companyInfo.name}...`, "fetchRisksNode");
   const model = getModel();
+  
   const query = `${state.companyInfo.name} risk factors litigation regulatory financial`;
   const searchResult = await searchDuckDuckGo(query, 5);
+  const dataExists = searchResult.success && searchResult.data && searchResult.data.length > 0;
   
-  const prompt = `Based on the following search results about risks for ${state.companyInfo.name}:
-${JSON.stringify(searchResult.data || [])}
+  const prompt = dataExists
+    ? `Based on the following search results about risks for ${state.companyInfo.name}:
+${JSON.stringify(searchResult.data)}
 
-Summarize the key risk factors (regulatory, financial, operational) in 2-3 sentences.`;
+Summarize the key risk factors (regulatory, financial, operational) in 2-3 sentences.`
+    : `Using your general knowledge about ${state.companyInfo.name}, summarize their key risk factors (regulatory, financial, operational) in 2-3 sentences.`;
 
   const res = await invokeWithRetry(model, [new HumanMessage(prompt)]);
   return {
-    risks: { summary: res.content, sources: searchResult.data },
+    risks: { summary: res.content, sources: dataExists ? searchResult.data : [] },
     logs: [`Analyzed risk factors for ${state.companyInfo.name}.`]
   };
 }

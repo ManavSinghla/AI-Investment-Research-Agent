@@ -1,6 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export default function LandingView({ query, onQueryChange, isSearching, onSearch, candidates }) {
+export default function LandingView({ query, onQueryChange, isSearching, onSearch, candidates, history, onSelectHistory }) {
+  const [wallet, setWallet] = useState({ status: 'disconnected', address: '' });
+
+  const handleConnect = () => {
+    setWallet({ status: 'connecting', address: '' });
+    setTimeout(() => {
+      setWallet({ status: 'connected', address: '0x71C...8E5' });
+    }, 1000);
+  };
+
   return (
     <>
       <div className="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#141313_100%)]"></div>
@@ -10,8 +19,19 @@ export default function LandingView({ query, onQueryChange, isSearching, onSearc
           AlphaLens
         </div>
         <div className="flex items-center gap-6">
-          <button className="font-label-caps text-label-caps uppercase border-[0.5px] border-white/20 px-6 py-2.5 rounded hover:border-white hover:bg-white/10 transition-all duration-300 tracking-[0.1em]">
-            Connect
+          <button 
+            onClick={handleConnect}
+            disabled={wallet.status === 'connecting'}
+            className="font-label-caps text-label-caps uppercase border-[0.5px] border-white/20 px-6 py-2.5 rounded hover:border-white hover:bg-white/10 transition-all duration-300 tracking-[0.1em] flex items-center space-x-2"
+          >
+            {wallet.status === 'disconnected' && <span>Connect Wallet</span>}
+            {wallet.status === 'connecting' && <span>Connecting...</span>}
+            {wallet.status === 'connected' && (
+              <>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+                <span>{wallet.address}</span>
+              </>
+            )}
           </button>
         </div>
       </nav>
@@ -20,6 +40,20 @@ export default function LandingView({ query, onQueryChange, isSearching, onSearc
         <div className="font-display-lg-mobile text-display-lg-mobile tracking-tighter text-primary">
           AlphaLens
         </div>
+        <button 
+          onClick={handleConnect}
+          disabled={wallet.status === 'connecting'}
+          className="text-xs font-label-caps border border-white/15 px-3 py-1.5 rounded text-white flex items-center space-x-1"
+        >
+          {wallet.status === 'disconnected' && <span>Connect</span>}
+          {wallet.status === 'connecting' && <span>...</span>}
+          {wallet.status === 'connected' && (
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+              <span>{wallet.address}</span>
+            </>
+          )}
+        </button>
       </nav>
 
       <main className="relative z-10 min-h-screen flex flex-col justify-center items-center px-6 md:px-container-padding pt-32 pb-24">
@@ -88,6 +122,30 @@ export default function LandingView({ query, onQueryChange, isSearching, onSearc
               </button>
             ))}
           </div>
+
+          {history && history.length > 0 && (
+            <div className="w-full max-w-2xl text-left animate-fade-in-up mt-8" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
+              <div className="text-on-surface-variant/60 font-label-caps text-[10px] uppercase tracking-widest mb-4">Recent Research Reports</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {history.map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => onSelectHistory(item)}
+                    className="flex items-center justify-between p-4 rounded-lg border border-white/10 hover:bg-white/5 hover:border-white/20 transition-all bg-white/5 backdrop-blur-32 text-left w-full group"
+                  >
+                    <div>
+                      <div className="text-white font-headline-md text-sm group-hover:text-primary transition-colors">{item.query}</div>
+                      <div className="text-on-surface-variant text-xs mt-1">{new Date(item.date).toLocaleDateString()}</div>
+                    </div>
+                    <div className={`px-2.5 py-1 rounded font-label-caps text-[10px] uppercase tracking-widest ${item.verdict?.decision === 'INVEST' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                      {item.verdict?.decision || 'UNKNOWN'}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
         </div>
       </main>

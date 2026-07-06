@@ -12,6 +12,14 @@ function App() {
   const [candidates, setCandidates] = useState(null);
   const [rawDimensions, setRawDimensions] = useState({});
   const [view, setView] = useState('landing'); // 'landing' | 'reasoning' | 'dashboard'
+  const [history, setHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem('alphalens_history');
+      return saved ? JSON.parse(saved) : [];
+    } catch(e) {
+      return [];
+    }
+  });
 
   const handleSearch = (e) => {
     if (e && e.preventDefault) e.preventDefault();
@@ -34,9 +42,13 @@ function App() {
       } catch(err) { }
     });
 
+    let currentVerdict = null;
+    let currentDimensions = {};
+
     eventSource.addEventListener('result', (e) => {
       try {
         const data = JSON.parse(e.data);
+        currentVerdict = data;
         setVerdict(data);
       } catch(err) { }
     });
@@ -45,6 +57,7 @@ function App() {
       eventSource.addEventListener(`dimension_${dim}`, (e) => {
         try {
           const data = JSON.parse(e.data);
+          currentDimensions[dim] = data;
           setRawDimensions(prev => ({ ...prev, [dim]: data }));
         } catch(err) { }
       });
@@ -61,6 +74,15 @@ function App() {
     });
 
     eventSource.addEventListener('done', (e) => {
+      if (currentVerdict) {
+        setHistory(prev => {
+          // Remove if query already exists to move it to the top
+          const filtered = prev.filter(h => h.query.toLowerCase() !== query.toLowerCase());
+          const newHistory = [{ query, date: Date.now(), verdict: currentVerdict, dimensions: currentDimensions }, ...filtered].slice(0, 10);
+          localStorage.setItem('alphalens_history', JSON.stringify(newHistory));
+          return newHistory;
+        });
+      }
       setIsSearching(false);
       setView('dashboard');
       eventSource.close();
@@ -81,9 +103,14 @@ function App() {
 
   const handleQueryChange = (val) => {
     setQuery(val);
-    if (!isSearching && val && val.length > 0 && view === 'landing') {
-      // Allow clicking trending to auto search if desired, but here we just set it
-    }
+  };
+
+  const handleSelectHistory = (item) => {
+    setQuery(item.query);
+    setVerdict(item.verdict);
+    setRawDimensions(item.dimensions);
+    setError(null);
+    setView('dashboard');
   };
 
   return (
@@ -95,6 +122,8 @@ function App() {
           onSearch={handleSearch} 
           candidates={candidates}
           isSearching={isSearching} 
+          history={history}
+          onSelectHistory={handleSelectHistory}
         />
       )}
       
@@ -103,7 +132,13 @@ function App() {
       )}
       
       {view === 'dashboard' && (
-        <DashboardView query={query} verdict={verdict} error={error} dimensions={rawDimensions} />
+        <DashboardView 
+          query={query} 
+          verdict={verdict} 
+          error={error} 
+          dimensions={rawDimensions} 
+          onClose={() => setView('landing')} 
+        />
       )}
     </>
   );

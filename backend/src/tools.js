@@ -1,13 +1,18 @@
-import yahooFinance from 'yahoo-finance2';
+import YahooFinance from 'yahoo-finance2';
 import { search } from 'duck-duck-scrape';
+
+const yahooFinance = new YahooFinance();
 
 export async function fetchFinancials(ticker) {
   try {
     const quote = await yahooFinance.quote(ticker);
-    const summaryDetail = await yahooFinance.quoteSummary(ticker, { modules: ['summaryDetail', 'financialData', 'defaultKeyStatistics'] });
+    const summaryDetail = await yahooFinance.quoteSummary(ticker, { 
+      modules: ['summaryDetail', 'financialData', 'defaultKeyStatistics', 'summaryProfile'] 
+    });
     
     const financialData = summaryDetail.financialData || {};
     const keyStats = summaryDetail.defaultKeyStatistics || {};
+    const profile = summaryDetail.summaryProfile || {};
 
     return {
       success: true,
@@ -19,9 +24,21 @@ export async function fetchFinancials(ticker) {
         revenueGrowth: financialData.revenueGrowth,
         profitMargins: financialData.profitMargins,
         operatingMargins: financialData.operatingMargins,
+        grossMargins: financialData.grossMargins,
+        returnOnEquity: financialData.returnOnEquity,
+        earningsGrowth: financialData.earningsGrowth,
+        totalRevenue: financialData.totalRevenue,
         totalDebt: financialData.totalDebt,
         debtToEquity: financialData.debtToEquity,
         freeCashflow: financialData.freeCashflow,
+        dividendYield: summaryDetail.dividendYield,
+        fiftyTwoWeekHigh: summaryDetail.fiftyTwoWeekHigh,
+        fiftyTwoWeekLow: summaryDetail.fiftyTwoWeekLow,
+        recommendationKey: financialData.recommendationKey,
+        sector: profile.sector,
+        industry: profile.industry,
+        website: profile.website,
+        description: profile.longBusinessSummary,
       }
     };
   } catch (error) {
@@ -31,9 +48,7 @@ export async function fetchFinancials(ticker) {
 
 export async function searchDuckDuckGo(query, numResults = 5) {
   try {
-    const searchResults = await search(query, {
-      safeSearch: 'moderate'
-    });
+    const searchResults = await search(query);
     
     return {
       success: true,
@@ -44,6 +59,22 @@ export async function searchDuckDuckGo(query, numResults = 5) {
       }))
     };
   } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function fetchYahooNews(ticker, numResults = 5) {
+  try {
+    const result = await yahooFinance.search(ticker);
+    return {
+      success: true,
+      data: (result.news || []).slice(0, numResults).map(n => ({
+        title: n.title,
+        link: n.link,
+        snippet: `Published by ${n.publisher} on ${new Date(n.providerPublishTime).toLocaleDateString()}`
+      }))
+    };
+  } catch(error) {
     return { success: false, error: error.message };
   }
 }

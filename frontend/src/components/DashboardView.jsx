@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Newspaper } from 'lucide-react';
 
-export default function DashboardView({ query, verdict, error, dimensions = {} }) {
+export default function DashboardView({ query, verdict, error, dimensions = {}, onClose }) {
   const [activeTab, setActiveTab] = useState('verdict');
 
   if (error) {
@@ -10,7 +10,7 @@ export default function DashboardView({ query, verdict, error, dimensions = {} }
         <span className="material-symbols-outlined text-[64px] text-error mb-4" style={{ fontVariationSettings: "'FILL' 1" }}>error</span>
         <h1 className="font-headline-md text-2xl text-error mb-2">Research Failed</h1>
         <p className="text-on-surface-variant max-w-md text-center">{error}</p>
-        <button className="mt-8 px-6 py-2 border border-white/20 rounded hover:bg-white/10" onClick={() => window.location.reload()}>Try Again</button>
+        <button className="mt-8 px-6 py-2 border border-white/20 rounded hover:bg-white/10" onClick={onClose}>Try Again</button>
       </div>
     );
   }
@@ -40,7 +40,7 @@ export default function DashboardView({ query, verdict, error, dimensions = {} }
         <div className="flex items-center space-x-8">
           <span className="text-outline font-label-caps text-label-caps">{query}</span>
           <span className="text-outline font-label-caps text-label-caps opacity-50">STAGE VIII : VERDICT</span>
-          <button className="text-primary hover:opacity-80 transition-opacity" onClick={() => window.location.reload()}>
+          <button className="text-primary hover:opacity-80 transition-opacity" onClick={onClose}>
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -152,16 +152,84 @@ export default function DashboardView({ query, verdict, error, dimensions = {} }
           )}
 
           {activeTab === 'financials' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-8">
               {dimensions.financials?.data ? (
-                Object.entries(dimensions.financials.data).map(([key, val]) => (
-                  <div key={key} className="bg-white/5 border border-white/10 p-6 rounded-lg flex flex-col justify-between">
-                    <span className="font-label-caps text-on-surface-variant opacity-70 mb-4">{key.replace(/([A-Z])/g, ' $1').toUpperCase()}</span>
-                    <span className="font-display-lg text-2xl text-white">
-                      {typeof val === 'number' ? (val > 1000 ? val.toLocaleString() : val.toFixed(2)) : val || 'N/A'}
-                    </span>
+                <>
+                  {/* Company Profile (DNA) Section */}
+                  {(dimensions.financials.data.description || dimensions.financials.data.sector || dimensions.financials.data.industry) && (
+                    <div className="bg-white/5 border border-white/10 p-8 rounded-lg relative overflow-hidden">
+                      <h3 className="font-label-caps text-primary mb-4">COMPANY PROFILE & DNA</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        {dimensions.financials.data.sector && (
+                          <div>
+                            <span className="text-xs font-label-caps text-on-surface-variant block uppercase opacity-75">Sector</span>
+                            <span className="text-white font-headline-md">{dimensions.financials.data.sector}</span>
+                          </div>
+                        )}
+                        {dimensions.financials.data.industry && (
+                          <div>
+                            <span className="text-xs font-label-caps text-on-surface-variant block uppercase opacity-75">Industry</span>
+                            <span className="text-white font-headline-md">{dimensions.financials.data.industry}</span>
+                          </div>
+                        )}
+                        {dimensions.financials.data.website && (
+                          <div>
+                            <span className="text-xs font-label-caps text-on-surface-variant block uppercase opacity-75">Website</span>
+                            <a href={dimensions.financials.data.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-headline-md flex items-center gap-1">
+                              {dimensions.financials.data.website.replace(/^https?:\/\//, '')}
+                              <span className="material-symbols-outlined text-sm">open_in_new</span>
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                      {dimensions.financials.data.description && (
+                        <div>
+                          <span className="text-xs font-label-caps text-on-surface-variant block uppercase mb-2 opacity-75">Business Summary</span>
+                          <p className="text-on-surface-variant leading-relaxed text-sm">{dimensions.financials.data.description}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Financial Stats Grid */}
+                  <h3 className="font-label-caps text-on-surface-variant mt-8 mb-4">KEY FINANCIAL METRICS</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {Object.entries(dimensions.financials.data)
+                      .filter(([key]) => !['description', 'sector', 'industry', 'website'].includes(key))
+                      .map(([key, val]) => {
+                        const isPercentage = ['revenueGrowth', 'profitMargins', 'operatingMargins', 'grossMargins', 'returnOnEquity', 'earningsGrowth', 'dividendYield'].includes(key);
+                        let displayVal = 'N/A';
+                        if (typeof val === 'number') {
+                          if (isPercentage) {
+                            displayVal = (val * 100).toFixed(2) + '%';
+                          } else if (val > 1000000000000) {
+                            displayVal = '$' + (val / 1000000000000).toFixed(2) + 'T';
+                          } else if (val > 1000000000) {
+                            displayVal = '$' + (val / 1000000000).toFixed(2) + 'B';
+                          } else if (val > 1000000) {
+                            displayVal = '$' + (val / 1000000).toFixed(2) + 'M';
+                          } else if (key.toLowerCase().includes('pe') || key.includes('Ratio') || key.includes('debtToEquity')) {
+                            displayVal = val.toFixed(2) + 'x';
+                          } else if (key === 'price' || key.toLowerCase().includes('high') || key.toLowerCase().includes('low')) {
+                            displayVal = '$' + val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                          } else {
+                            displayVal = val.toLocaleString();
+                          }
+                        } else if (val) {
+                          displayVal = val.toString().toUpperCase();
+                        }
+
+                        return (
+                          <div key={key} className="bg-white/5 border border-white/10 p-6 rounded-lg flex flex-col justify-between">
+                            <span className="font-label-caps text-on-surface-variant opacity-70 mb-4">{key.replace(/([A-Z])/g, ' $1').toUpperCase()}</span>
+                            <span className="font-display-lg text-2xl text-white">
+                              {displayVal}
+                            </span>
+                          </div>
+                        );
+                      })}
                   </div>
-                ))
+                </>
               ) : (
                 <div className="text-on-surface-variant">Loading or unavailable...</div>
               )}
