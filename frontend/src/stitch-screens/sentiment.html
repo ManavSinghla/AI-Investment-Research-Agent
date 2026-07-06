@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NVIDIA Sentiment Universe - AlphaLens</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#45464e",
+                        "on-tertiary": "#2f3131",
+                        "surface-container-low": "#1c1b1b",
+                        "inverse-on-surface": "#313030",
+                        "on-primary-fixed-variant": "#454747",
+                        "surface": "#141313",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary": "#c6c6cf",
+                        "on-primary-fixed": "#1a1c1c",
+                        "background": "#141313",
+                        "on-secondary-fixed": "#1a1b22",
+                        "primary-fixed": "#e2e2e2",
+                        "on-secondary-container": "#b4b4bd",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "tertiary": "#ffffff",
+                        "error-container": "#93000a",
+                        "surface-tint": "#c6c6c7",
+                        "surface-container-highest": "#353434",
+                        "outline": "#8e9192",
+                        "on-secondary": "#2f3037",
+                        "secondary-fixed-dim": "#c6c6cf",
+                        "secondary-container": "#45464e",
+                        "on-primary-container": "#636565",
+                        "inverse-primary": "#5d5f5f",
+                        "secondary-fixed": "#e2e1eb",
+                        "on-surface": "#e5e2e1",
+                        "surface-dim": "#141313",
+                        "error": "#ffb4ab",
+                        "on-background": "#e5e2e1",
+                        "on-tertiary-container": "#636565",
+                        "surface-container-high": "#2a2a2a",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-container": "#201f1f",
+                        "on-error": "#690005",
+                        "on-primary": "#2f3131",
+                        "outline-variant": "#444748",
+                        "on-surface-variant": "#c4c7c8",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-error-container": "#ffdad6",
+                        "surface-variant": "#353434",
+                        "primary-container": "#e2e2e2",
+                        "primary": "#ffffff",
+                        "tertiary-fixed": "#e2e2e2",
+                        "tertiary-container": "#e2e2e2",
+                        "surface-bright": "#3a3939",
+                        "on-tertiary-fixed": "#1a1c1c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "section-gap": "128px",
+                        "safe-area-mobile": "20px",
+                        "container-padding": "64px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Newsreader", "serif"],
+                        "label-caps": ["Geist", "sans-serif"],
+                        "headline-md": ["Newsreader", "serif"],
+                        "mono-data": ["Geist", "monospace"],
+                        "display-lg-mobile": ["Newsreader", "serif"],
+                        "body-md": ["Geist", "sans-serif"],
+                        "body-lg": ["Geist", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "400" }],
+                        "mono-data": ["14px", { "lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "fontWeight": "300" }],
+                        "body-md": ["15px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&display=swap');
+        body { font-family: 'Geist', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col relative overflow-x-hidden selection:bg-white/20 selection:text-white">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/15 dark:bg-surface/15 backdrop-blur-3xl flex justify-between items-center px-container-padding h-20 border-b border-white/10">
+<div class="font-display-lg text-display-lg-mobile md:text-[32px] text-primary dark:text-primary italic leading-none">AlphaLens</div>
+<ul class="hidden md:flex gap-8 items-center h-full">
+<li><a class="font-body-md text-body-md uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors duration-300" href="#">AlphaLens</a></li>
+<li><a class="font-body-md text-body-md uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors duration-300" href="#">Markets</a></li>
+<li class="h-full flex items-center"><a class="font-body-md text-body-md uppercase tracking-widest text-primary border-b border-primary pb-1 pt-1 h-fit" href="#">Insights</a></li>
+<li><a class="font-body-md text-body-md uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors duration-300" href="#">Portfolio</a></li>
+<li><a class="font-body-md text-body-md uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors duration-300" href="#">Terminal</a></li>
+</ul>
+<div class="flex gap-4 items-center">
+<button class="material-symbols-outlined text-on-surface-variant/60 hover:text-primary hover:bg-white/5 transition-all duration-200 p-2 rounded-full active:opacity-80 active:scale-[0.99]">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant/60 hover:text-primary hover:bg-white/5 transition-all duration-200 p-2 rounded-full active:opacity-80 active:scale-[0.99]">account_circle</button>
+</div>
+</nav>
+<!-- Main Cinematic Canvas -->
+<main class="flex-1 relative w-full min-h-screen flex flex-col items-center justify-center pt-20">
+<!-- Background Animation -->
+<!-- STITCH_THREEJS_START:ANIMATION_16 class="absolute inset-0 w-full h-full pointer-events-none opacity-80 mix-blend-screen" -->
+<div class="absolute inset-0 w-full h-full pointer-events-none opacity-80 mix-blend-screen" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_16" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_16');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  (function() {
+  const container = document.getElementById('threejs-container-SENTIMENT');
+  const width = container.clientWidth || window.innerWidth;
+  const height = container.clientHeight || window.innerHeight;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+  camera.position.z = 15;
+
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  // Central Company Core (Atmospheric)
+  const coreGeo = new THREE.IcosahedronGeometry(2, 2);
+  const coreMat = new THREE.MeshPhongMaterial({ 
+    color: 0xffffff, 
+    wireframe: true, 
+    transparent: true, 
+    opacity: 0.05 
+  });
+  const core = new THREE.Mesh(coreGeo, coreMat);
+  group.add(core);
+
+  // Particle System Parameters
+  const particlesCount = 800;
+  const posArr = new Float32Array(particlesCount * 3);
+  const colorArr = new Float32Array(particlesCount * 3);
+  const velocityArr = new Float32Array(particlesCount * 3);
+  const typeArr = new Float32Array(particlesCount); // 0: Neutral, 1: Positive, 2: Negative
+
+  for(let i = 0; i < particlesCount; i++) {
+    // Random spherical distribution
+    const r = 5 + Math.random() * 15;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos((Math.random() * 2) - 1);
+
+    posArr[i*3] = r * Math.sin(phi) * Math.cos(theta);
+    posArr[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+    posArr[i*3+2] = r * Math.cos(phi);
+
+    // Randomize Sentiment Type
+    const rand = Math.random();
+    if (rand > 0.7) { // Positive
+      typeArr[i] = 1;
+      colorArr[i*3] = 1.0; colorArr[i*3+1] = 1.0; colorArr[i*3+2] = 1.0; // White glow
+    } else if (rand < 0.15) { // Negative
+      typeArr[i] = 2;
+      colorArr[i*3] = 0.4; colorArr[i*3+1] = 0.4; colorArr[i*3+2] = 0.4; // Dim gray
+    } else { // Neutral
+      typeArr[i] = 0;
+      colorArr[i*3] = 0.7; colorArr[i*3+1] = 0.7; colorArr[i*3+2] = 0.7;
+    }
+
+    velocityArr[i*3] = (Math.random() - 0.5) * 0.02;
+    velocityArr[i*3+1] = (Math.random() - 0.5) * 0.02;
+    velocityArr[i*3+2] = (Math.random() - 0.5) * 0.02;
+  }
+
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+  starGeo.setAttribute('color', new THREE.BufferAttribute(colorArr, 3));
+  
+  const starMat = new THREE.PointsMaterial({ 
+    size: 0.08, 
+    vertexColors: true, 
+    transparent: true, 
+    opacity: 0.6,
+    blending: THREE.AdditiveBlending 
+  });
+  
+  const stars = new THREE.Points(starGeo, starMat);
+  group.add(stars);
+
+  // Lights
+  const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+  scene.add(ambient);
+
+  // Animation
+  let time = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    time += 0.005;
+
+    const positions = starGeo.attributes.position.array;
+    for(let i = 0; i < particlesCount; i++) {
+      const x = positions[i*3];
+      const y = positions[i*3+1];
+      const z = positions[i*3+2];
+      const dist = Math.sqrt(x*x + y*y + z*z);
+      const type = typeArr[i];
+
+      if (type === 1) { // Positive: Pull toward core
+        positions[i*3] -= x * 0.002;
+        positions[i*3+1] -= y * 0.002;
+        positions[i*3+2] -= z * 0.002;
+        if (dist < 1.5) { // Reset far away
+           const r = 20;
+           positions[i*3] = (Math.random() - 0.5) * r * 2;
+           positions[i*3+1] = (Math.random() - 0.5) * r * 2;
+           positions[i*3+2] = (Math.random() - 0.5) * r * 2;
+        }
+      } else if (type === 2) { // Negative: Push away
+        positions[i*3] += x * 0.001;
+        positions[i*3+1] += y * 0.001;
+        positions[i*3+2] += z * 0.001;
+        if (dist > 30) { // Reset near core
+           positions[i*3] = (Math.random() - 0.5) * 4;
+           positions[i*3+1] = (Math.random() - 0.5) * 4;
+           positions[i*3+2] = (Math.random() - 0.5) * 4;
+        }
+      } else { // Neutral: Orbit
+        const speed = 0.002;
+        positions[i*3] = x * Math.cos(speed) - z * Math.sin(speed);
+        positions[i*3+2] = x * Math.sin(speed) + z * Math.cos(speed);
+      }
+    }
+    starGeo.attributes.position.needsUpdate = true;
+
+    group.rotation.y += 0.0005;
+    core.rotation.x += 0.001;
+    
+    renderer.render(scene, camera);
+  }
+
+  window.addEventListener('resize', () => {
+    const w = container.clientWidth || window.innerWidth;
+    const h = container.clientHeight || window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
+
+  animate();
+})();
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_16 -->
+<!-- Vignette overlay for depth -->
+<div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,rgba(14,14,14,0.9)_100%)] z-0"></div>
+<div class="z-10 w-full max-w-7xl px-container-padding flex flex-col items-center gap-section-gap">
+<!-- Hero Title -->
+<header class="text-center flex flex-col items-center gap-6">
+<div class="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
+<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+<span class="font-mono-data text-mono-data text-on-surface-variant uppercase tracking-widest">Stage VI Active</span>
+</div>
+<h1 class="font-display-lg text-[80px] md:text-[140px] text-primary leading-none tracking-tighter mix-blend-plus-lighter" style="text-shadow: 0 0 40px rgba(255,255,255,0.1);">
+                    NVIDIA
+                </h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant tracking-[0.3em] uppercase">Sentiment Universe</p>
+</header>
+<!-- Data Panels (Bento Grid) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter w-full">
+<!-- Panel 1: Overall Sentiment -->
+<article class="md:col-span-4 bg-surface/15 backdrop-blur-3xl border border-white/10 rounded-2xl p-8 flex flex-col justify-between min-h-[280px] group hover:bg-white/5 transition-all duration-500 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+<h2 class="font-label-caps text-label-caps text-on-surface-variant uppercase">Overall Sentiment</h2>
+<div class="mt-8">
+<div class="flex items-baseline gap-1">
+<span class="font-display-lg text-display-lg text-primary">82</span>
+<span class="font-headline-md text-headline-md text-on-surface-variant">/100</span>
+</div>
+<div class="mt-4 flex items-center gap-3 border border-white/10 bg-white/5 w-fit px-3 py-1.5 rounded">
+<div class="w-1.5 h-1.5 bg-primary rounded-sm shadow-[0_0_10px_rgba(255,255,255,0.5)]"></div>
+<span class="font-mono-data text-mono-data text-primary uppercase">Strongly Bullish</span>
+</div>
+</div>
+</article>
+<!-- Panel 2: Velocity -->
+<article class="md:col-span-3 bg-surface/15 backdrop-blur-3xl border border-white/10 rounded-2xl p-8 flex flex-col justify-between min-h-[280px] group hover:bg-white/5 transition-all duration-500 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+<h2 class="font-label-caps text-label-caps text-on-surface-variant uppercase">Sentiment Velocity</h2>
+<div class="mt-8 flex flex-col gap-2">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-[40px] font-light">trending_up</span>
+<span class="font-display-lg text-display-lg-mobile md:text-display-lg">+12%</span>
+</div>
+<p class="font-mono-data text-mono-data text-on-surface-variant opacity-60 uppercase">Rolling 24h Window</p>
+</div>
+</article>
+<!-- Panel 3: Recent Pulse -->
+<article class="md:col-span-5 bg-surface/15 backdrop-blur-3xl border border-white/10 rounded-2xl p-8 flex flex-col min-h-[280px] group hover:bg-white/5 transition-all duration-500 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant uppercase">Recent Pulse</h2>
+<span class="material-symbols-outlined text-on-surface-variant/50 text-sm animate-pulse">radar</span>
+</div>
+<div class="flex flex-col gap-6 flex-1 justify-end">
+<div class="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-1.5 before:w-px before:h-[calc(100%-6px)] before:bg-gradient-to-b before:from-white/40 before:to-transparent">
+<div class="absolute left-[-2px] top-1.5 w-[5px] h-[5px] bg-white rounded-full"></div>
+<time class="font-mono-data text-[10px] text-on-surface-variant uppercase tracking-wider block mb-1">Live • Dark Pools</time>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">Jensen Huang Keynote: Institutional Accumulation patterns detected across high-frequency nodes.</p>
+</div>
+<div class="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-1.5 before:w-px before:h-[calc(100%-6px)] before:bg-gradient-to-b before:from-white/20 before:to-transparent opacity-60">
+<div class="absolute left-[-1px] top-1.5 w-[3px] h-[3px] bg-white/60 rounded-full"></div>
+<time class="font-mono-data text-[10px] text-on-surface-variant uppercase tracking-wider block mb-1">T-4 Hours</time>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">Data Center Demand Forecast Upgraded by multi-strategy quantitative desk.</p>
+</div>
+</div>
+</article>
+</div>
+</div>
+<!-- Scroll Hint -->
+<div class="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-20 opacity-50 hover:opacity-100 transition-opacity cursor-pointer group">
+<span class="font-label-caps text-[10px] tracking-[0.2em] uppercase text-primary">Scroll to Analyze Risks</span>
+<span class="material-symbols-outlined text-primary text-sm group-hover:translate-y-1 transition-transform duration-300">south</span>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-gutter bg-surface dark:bg-surface border-t border-white/5 flex flex-col md:flex-row justify-between items-center px-container-padding gap-gutter z-10 relative">
+<div class="font-display-lg text-primary text-2xl italic">AlphaLens</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant dark:text-on-surface-variant uppercase tracking-widest text-[10px]">© 2024 AlphaLens Institutional. All rights reserved.</p>
+<ul class="flex gap-6">
+<li><a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300 hover:opacity-100 uppercase" href="#">Privacy</a></li>
+<li><a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300 hover:opacity-100 uppercase" href="#">Terms</a></li>
+<li><a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300 hover:opacity-100 uppercase" href="#">API</a></li>
+<li><a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300 hover:opacity-100 uppercase" href="#">Security</a></li>
+</ul>
+</footer>
+</body></html>

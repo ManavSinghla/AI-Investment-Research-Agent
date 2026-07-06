@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AlphaLens - AI Research Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Newsreader:opsz,wght@6..72,300;6..72,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-bright": "#3a3939",
+                      "on-secondary-fixed": "#1a1b22",
+                      "secondary-fixed": "#e2e1eb",
+                      "secondary-fixed-dim": "#c6c6cf",
+                      "surface-container": "#201f1f",
+                      "primary-fixed": "#e2e2e2",
+                      "error-container": "#93000a",
+                      "surface-tint": "#c6c6c7",
+                      "on-error": "#690005",
+                      "tertiary-fixed": "#e2e2e2",
+                      "on-error-container": "#ffdad6",
+                      "on-background": "#e5e2e1",
+                      "on-primary": "#2f3131",
+                      "primary-fixed-dim": "#c6c6c7",
+                      "surface-container-lowest": "#0e0e0e",
+                      "outline-variant": "#444748",
+                      "outline": "#8e9192",
+                      "error": "#ffb4ab",
+                      "background": "#141313",
+                      "on-secondary": "#2f3037",
+                      "on-secondary-container": "#b4b4bd",
+                      "surface-dim": "#141313",
+                      "secondary": "#c6c6cf",
+                      "on-tertiary-fixed": "#1a1c1c",
+                      "on-surface": "#e5e2e1",
+                      "tertiary": "#ffffff",
+                      "inverse-surface": "#e5e2e1",
+                      "on-primary-container": "#636565",
+                      "secondary-container": "#45464e",
+                      "surface-container-low": "#1c1b1b",
+                      "surface-container-high": "#2a2a2a",
+                      "primary": "#ffffff",
+                      "tertiary-fixed-dim": "#c6c6c7",
+                      "tertiary-container": "#e2e2e2",
+                      "on-primary-fixed": "#1a1c1c",
+                      "on-primary-fixed-variant": "#454747",
+                      "primary-container": "#e2e2e2",
+                      "on-tertiary-container": "#636565",
+                      "surface-variant": "#353434",
+                      "surface": "#141313",
+                      "on-surface-variant": "#c4c7c8",
+                      "on-secondary-fixed-variant": "#45464e",
+                      "on-tertiary": "#2f3131",
+                      "inverse-primary": "#5d5f5f",
+                      "inverse-on-surface": "#313030",
+                      "surface-container-highest": "#353434",
+                      "on-tertiary-fixed-variant": "#454747"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "section-gap": "128px",
+                      "gutter": "24px",
+                      "unit": "8px",
+                      "container-padding": "64px",
+                      "safe-area-mobile": "20px"
+              },
+              "fontFamily": {
+                      "mono-data": [
+                              "Geist"
+                      ],
+                      "display-lg-mobile": [
+                              "Newsreader"
+                      ],
+                      "headline-md": [
+                              "Newsreader"
+                      ],
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "label-caps": [
+                              "Geist"
+                      ],
+                      "display-lg": [
+                              "Newsreader"
+                      ],
+                      "body-lg": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "mono-data": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "40px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "300"
+                              }
+                      ],
+                      "headline-md": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "15px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "64px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "300"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .divider-gradient {
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%);
+            height: 0.5px;
+        }
+        .blinking-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 14px;
+            background-color: white;
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+            margin-left: 4px;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+      </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- Shared Component: TopNavBar (Destination: Research Engine) -->
+<nav class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-container-padding h-20 w-full">
+<div class="font-headline-md text-headline-md tracking-tighter text-primary">
+            ALPHALENS
+        </div>
+<div class="hidden md:flex gap-8 items-center">
+<div class="font-label-caps text-label-caps text-primary border-b-2 border-primary pb-1 cursor-pointer active:opacity-70">
+                Intelligence
+             </div>
+<div class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300 cursor-pointer active:opacity-70">
+                Ecosystem
+             </div>
+<div class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors duration-300 cursor-pointer active:opacity-70">
+                Financials
+             </div>
+</div>
+<div class="flex items-center gap-6 text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors duration-300" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors duration-300" data-icon="account_circle">account_circle</span>
+</div>
+</nav>
+<!-- Background 3D Animation Placeholder -->
+
+<!-- Main Content Container -->
+<main class="relative z-10 pt-[120px] px-container-padding h-screen flex flex-col pointer-events-none">
+<!-- Header Section -->
+<header class="mb-gutter flex flex-col items-center text-center">
+<div class="font-label-caps text-label-caps text-on-surface-variant tracking-[0.2em] mb-4 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                STAGE III
+            </div>
+<h1 class="font-display-lg text-display-lg text-primary md:text-display-lg text-display-lg-mobile">The Reasoning Layer</h1>
+</header>
+<!-- Research Phases -->
+<div class="w-full max-w-5xl mx-auto mb-section-gap relative">
+<div class="divider-gradient absolute top-1/2 left-0 w-full -z-10"></div>
+<div class="flex justify-between items-center bg-surface-container-lowest/50 backdrop-blur-2xl rounded-full px-8 py-4 border border-white/10">
+<div class="flex flex-col items-center gap-2 relative z-10">
+<div class="w-4 h-4 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+</div>
+<span class="font-mono-data text-mono-data text-on-surface-variant text-[10px]">Data Ingestion</span>
+</div>
+<div class="flex flex-col items-center gap-2 relative z-10">
+<div class="w-4 h-4 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+</div>
+<span class="font-mono-data text-mono-data text-on-surface-variant text-[10px]">Financial Extraction</span>
+</div>
+<div class="flex flex-col items-center gap-2 relative z-10">
+<div class="w-4 h-4 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+</div>
+<span class="font-mono-data text-mono-data text-on-surface-variant text-[10px]">Sentiment Analysis</span>
+</div>
+<div class="flex flex-col items-center gap-2 relative z-10">
+<div class="w-6 h-6 rounded-full bg-primary border border-primary flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+<span class="material-symbols-outlined text-background text-[14px]" style="font-variation-settings: 'FILL' 1;">sync</span>
+</div>
+<span class="font-mono-data text-mono-data text-primary text-[10px]">Risk Modeling</span>
+</div>
+<div class="flex flex-col items-center gap-2 relative z-10">
+<div class="w-4 h-4 rounded-full bg-surface-container border border-white/20 flex items-center justify-center">
+</div>
+<span class="font-mono-data text-mono-data text-on-surface-variant/50 text-[10px]">Verdict Synthesis</span>
+</div>
+</div>
+</div>
+<!-- Middle Section: Logic Threads & Empty Space -->
+<div class="flex-1 flex w-full max-w-7xl mx-auto grid grid-cols-12 gap-8 relative">
+<!-- Left: Active Logic Threads -->
+<div class="col-span-3 flex flex-col justify-end pb-24">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-6 border-b border-white/10 pb-2">Active Logic Threads</div>
+<div class="flex flex-col gap-4 font-mono-data text-mono-data text-sm opacity-80" id="logic-threads">
+<div class="flex items-start gap-3">
+<span class="text-primary mt-0.5 opacity-50">›</span>
+<span class="text-on-surface-variant">Processing 10-K filings...</span>
+</div>
+<div class="flex items-start gap-3">
+<span class="text-primary mt-0.5 opacity-50">›</span>
+<span class="text-on-surface-variant">Calculating weighted cost of capital...</span>
+</div>
+<div class="flex items-start gap-3">
+<span class="text-primary mt-0.5">›</span>
+<span class="text-primary">Parsing executive sentiment<span class="blinking-cursor"></span></span>
+</div>
+</div>
+</div>
+<!-- Right: Open area for 3D visualization to breathe -->
+<div class="col-span-9">
+<!-- Void space for the central node visualization -->
+</div>
+</div>
+<!-- Bottom Panel: AI Thinking Process -->
+<div class="w-full max-w-4xl mx-auto mb-16 relative">
+<!-- Glassmorphic Container -->
+<div class="bg-surface-container-lowest/30 backdrop-blur-[32px] border border-white/10 rounded-xl p-8 relative overflow-hidden">
+<!-- Subtle Top Gradient Line -->
+<div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+<div class="flex items-start gap-6">
+<div class="mt-1">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div class="flex flex-col gap-3">
+<div class="font-label-caps text-label-caps text-on-surface-variant">AI THINKING PROCESS</div>
+<p class="font-body-lg text-body-lg text-on-surface leading-relaxed max-w-2xl">
+                            The engine is currently traversing 4.2 million data points to reconcile divergent analyst projections with historical cash flow patterns.
+                        </p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple script to simulate new logic threads appearing
+        document.addEventListener('DOMContentLoaded', () => {
+            const threadsContainer = document.getElementById('logic-threads');
+            const messages = [
+                "Cross-referencing global supply chain disruptions...",
+                "Evaluating macro-economic indicators...",
+                "Simulating downside risk scenarios..."
+            ];
+            
+            let messageIndex = 0;
+            
+            setInterval(() => {
+                if (messageIndex >= messages.length) return;
+                
+                // Remove blinking cursor from previous active item
+                const currentActive = threadsContainer.querySelector('.text-primary:last-child');
+                if (currentActive) {
+                    currentActive.classList.remove('text-primary');
+                    currentActive.classList.add('text-on-surface-variant');
+                    const cursor = currentActive.querySelector('.blinking-cursor');
+                    if(cursor) cursor.remove();
+                }
+
+                // Add new message
+                const newRow = document.createElement('div');
+                newRow.className = 'flex items-start gap-3 fade-in';
+                newRow.innerHTML = `
+                    <span class="text-primary mt-0.5">›</span>
+                    <span class="text-primary">${messages[messageIndex]}<span class="blinking-cursor"></span></span>
+                `;
+                
+                threadsContainer.appendChild(newRow);
+                
+                // Keep only the last 4 messages
+                if (threadsContainer.children.length > 4) {
+                    threadsContainer.removeChild(threadsContainer.firstChild);
+                }
+                
+                messageIndex++;
+            }, 3500);
+        });
+    </script>
+</body></html>

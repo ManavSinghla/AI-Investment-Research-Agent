@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AlphaLens - Competitive Landscape</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&amp;family=Newsreader:opsz,wght@6..72,200..600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#141313",
+                        "outline": "#8e9192",
+                        "surface-bright": "#3a3939",
+                        "tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#454747",
+                        "primary-container": "#e2e2e2",
+                        "on-surface": "#e5e2e1",
+                        "surface-tint": "#c6c6c7",
+                        "on-tertiary-container": "#636565",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-surface-variant": "#c4c7c8",
+                        "primary": "#ffffff",
+                        "primary-fixed": "#e2e2e2",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-primary-container": "#636565",
+                        "on-error": "#690005",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "on-secondary-fixed": "#1a1b22",
+                        "on-background": "#e5e2e1",
+                        "on-secondary-container": "#b4b4bd",
+                        "secondary": "#c6c6cf",
+                        "secondary-fixed-dim": "#c6c6cf",
+                        "surface-container-highest": "#353434",
+                        "secondary-container": "#45464e",
+                        "outline-variant": "#444748",
+                        "surface": "#141313",
+                        "surface-container-high": "#2a2a2a",
+                        "on-secondary-fixed-variant": "#45464e",
+                        "inverse-primary": "#5d5f5f",
+                        "on-primary-fixed": "#1a1c1c",
+                        "on-primary": "#2f3131",
+                        "background": "#141313",
+                        "on-secondary": "#2f3037",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "secondary-fixed": "#e2e1eb",
+                        "on-tertiary": "#2f3131",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-variant": "#353434",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container": "#201f1f",
+                        "tertiary-container": "#e2e2e2",
+                        "inverse-on-surface": "#313030"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "safe-area-mobile": "20px",
+                        "container-padding": "64px",
+                        "section-gap": "128px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Newsreader"],
+                        "body-lg": ["Geist"],
+                        "display-lg": ["Newsreader"],
+                        "display-lg-mobile": ["Newsreader"],
+                        "label-caps": ["Geist"],
+                        "mono-data": ["Geist"],
+                        "body-md": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "fontWeight": "300" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "mono-data": ["14px", { "lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "body-md": ["15px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #141313; color: #e5e2e1; overflow: hidden; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+        .scroll-indicator {
+            width: 1px;
+            height: 48px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+            animation: pulse-scroll 2s infinite ease-in-out;
+        }
+        @keyframes pulse-scroll {
+            0% { transform: scaleY(0.8); opacity: 0.5; transform-origin: top; }
+            50% { transform: scaleY(1.2); opacity: 1; transform-origin: top; }
+            100% { transform: scaleY(0.8); opacity: 0.5; transform-origin: top; }
+        }
+        .reveal-text {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+            animation: slide-up 1s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        @keyframes slide-up {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+    </style>
+</head>
+<body class="antialiased min-h-screen relative w-full flex flex-col font-body-md text-body-md">
+<!-- Background Animation -->
+<div class="fixed inset-0 w-full h-full z-0 opacity-80 mix-blend-screen pointer-events-none">
+
+</div>
+<!-- Vignette / Gradient Overlay -->
+<div class="fixed inset-0 w-full h-full z-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_transparent_20%,_#141313_100%)]"></div>
+<!-- Top Navigation (Shared Component) -->
+<header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/10 text-primary">
+<div class="flex justify-between items-center px-container-padding h-20 w-full">
+<div class="font-display-lg text-display-lg-mobile md:text-display-lg tracking-tighter text-primary">AlphaLens</div>
+<nav class="hidden md:flex space-x-12">
+<a class="text-outline font-label-caps text-label-caps hover:text-primary transition-colors duration-300" href="#">Intelligence</a>
+<a class="text-primary border-b border-primary pb-1 font-label-caps text-label-caps hover:text-primary transition-colors duration-300 opacity-80 transition-opacity" href="#">Ecosystem</a>
+<a class="text-outline font-label-caps text-label-caps hover:text-primary transition-colors duration-300" href="#">Financials</a>
+</nav>
+<button class="hidden md:flex items-center space-x-2 px-6 py-2 border-[0.5px] border-white/20 rounded-DEFAULT hover:border-white hover:bg-white/10 transition-all duration-300 group">
+<span class="font-label-caps text-label-caps text-primary uppercase">Connect</span>
+<span class="material-symbols-outlined text-[16px] text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<!-- Mobile Menu Icon (Simplified for structure) -->
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="relative z-10 flex-grow flex flex-col justify-center items-center px-safe-area-mobile md:px-container-padding pt-24 pb-32 min-h-screen">
+<!-- Central Typography Cluster -->
+<div class="text-center flex flex-col items-center justify-center space-y-6 max-w-4xl mx-auto w-full">
+<div class="flex items-center space-x-4 reveal-text">
+<span class="w-12 h-[1px] bg-white/30"></span>
+<span class="font-label-caps text-label-caps text-outline tracking-widest uppercase">STAGE IV</span>
+<span class="w-12 h-[1px] bg-white/30"></span>
+</div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary reveal-text delay-100">
+                Competitive Landscape
+            </h1>
+<h2 class="font-headline-md text-headline-md text-surface-tint tracking-wide reveal-text delay-200">
+                NVIDIA
+            </h2>
+</div>
+<!-- Ecosystem Insights Panels (Absolute positioning for desktop, flow for mobile) -->
+<div class="w-full flex flex-col md:flex-row justify-between items-center absolute top-1/2 -translate-y-1/2 px-safe-area-mobile md:px-container-padding pointer-events-none mt-48 md:mt-0 gap-8 md:gap-0">
+<!-- Left Panel -->
+<div class="glass-panel p-8 rounded-lg max-w-xs text-left reveal-text delay-300 pointer-events-auto w-full md:w-auto relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="font-label-caps text-label-caps text-outline mb-4">MARKET SIMILARITY</div>
+<div class="font-mono-data text-[48px] font-light text-primary leading-none mb-4 tracking-tighter">94%</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm leading-relaxed">
+                    High architectural overlap in data center GPU segments.
+                </p>
+<div class="w-full h-[1px] bg-gradient-to-r from-white/20 to-transparent mt-6"></div>
+</div>
+<!-- Right Panel -->
+<div class="glass-panel p-8 rounded-lg max-w-xs text-left reveal-text delay-300 pointer-events-auto w-full md:w-auto relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-l from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="font-label-caps text-label-caps text-outline mb-4">INFLUENCE SCORE</div>
+<div class="font-mono-data text-[48px] font-light text-primary leading-none mb-4 tracking-tighter">8.9<span class="text-2xl text-surface-tint">/10</span></div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm leading-relaxed">
+                    Dominant pricing power across sovereign AI initiatives.
+                </p>
+<div class="w-full h-[1px] bg-gradient-to-l from-white/20 to-transparent mt-6"></div>
+</div>
+</div>
+</main>
+<!-- Footer Scroll Indicator -->
+<footer class="fixed bottom-0 left-0 w-full flex flex-col items-center justify-end pb-12 z-20 pointer-events-none">
+<div class="font-label-caps text-[10px] text-outline uppercase tracking-widest mb-4">Scroll to Navigate</div>
+<div class="scroll-indicator"></div>
+</footer>
+</body></html>

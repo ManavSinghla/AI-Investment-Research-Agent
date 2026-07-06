@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Financial Health - AlphaLens</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#c6c6c7",
+                        "outline-variant": "#444748",
+                        "tertiary-fixed": "#e2e2e2",
+                        "inverse-on-surface": "#313030",
+                        "surface-variant": "#353434",
+                        "primary": "#ffffff",
+                        "on-surface-variant": "#c4c7c8",
+                        "error-container": "#93000a",
+                        "inverse-surface": "#e5e2e1",
+                        "inverse-primary": "#5d5f5f",
+                        "secondary-fixed-dim": "#c6c6cf",
+                        "on-error": "#690005",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface": "#141313",
+                        "primary-fixed": "#e2e2e2",
+                        "on-background": "#e5e2e1",
+                        "tertiary": "#ffffff",
+                        "secondary-container": "#45464e",
+                        "on-tertiary": "#2f3131",
+                        "on-secondary": "#2f3037",
+                        "surface-bright": "#3a3939",
+                        "on-primary": "#2f3131",
+                        "outline": "#8e9192",
+                        "background": "#141313",
+                        "on-secondary-fixed-variant": "#45464e",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-tint": "#c6c6c7",
+                        "on-primary-fixed-variant": "#454747",
+                        "on-secondary-fixed": "#1a1b22",
+                        "error": "#ffb4ab",
+                        "on-primary-container": "#636565",
+                        "primary-container": "#e2e2e2",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "tertiary-container": "#e2e2e2",
+                        "on-tertiary-container": "#636565",
+                        "on-secondary-container": "#b4b4bd",
+                        "surface-container": "#201f1f",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary": "#c6c6cf",
+                        "on-surface": "#e5e2e1",
+                        "surface-container-highest": "#353434",
+                        "surface-dim": "#141313",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "secondary-fixed": "#e2e1eb",
+                        "on-primary-fixed": "#1a1c1c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "safe-area-mobile": "20px",
+                        "container-padding": "64px",
+                        "unit": "8px",
+                        "gutter": "24px",
+                        "section-gap": "128px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Geist", "sans-serif"],
+                        "mono-data": ["Geist", "monospace"],
+                        "display-lg-mobile": ["Newsreader", "serif"],
+                        "display-lg": ["Newsreader", "serif"],
+                        "body-lg": ["Geist", "sans-serif"],
+                        "label-caps": ["Geist", "sans-serif"],
+                        "headline-md": ["Newsreader", "serif"]
+                    },
+                    "fontSize": {
+                        "body-md": ["15px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "mono-data": ["14px", { "lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "fontWeight": "300" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Newsreader:wght@300;400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #141313;
+            color: #e5e2e1;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface h-screen w-screen flex flex-col font-body-md overflow-hidden relative">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-container-padding h-20">
+<div class="font-display-lg-mobile md:font-display-lg tracking-tighter text-primary text-2xl md:text-3xl">AlphaLens</div>
+<div class="hidden md:flex gap-8">
+<a class="text-outline font-label-caps text-label-caps hover:text-primary transition-colors duration-300" href="#">Intelligence</a>
+<a class="text-outline font-label-caps text-label-caps hover:text-primary transition-colors duration-300" href="#">Ecosystem</a>
+<a class="text-primary border-b border-primary pb-1 font-label-caps text-label-caps hover:text-primary transition-colors duration-300" href="#">Financials</a>
+</div>
+<button class="text-primary font-label-caps text-label-caps border border-white/10 rounded-DEFAULT px-4 py-2 hover:bg-white/10 hover:border-white transition-all duration-300 uppercase">Connect</button>
+</nav>
+<!-- Main Canvas -->
+<main class="flex-1 relative w-full h-full pt-20 flex flex-col items-center justify-center">
+<!-- Background Animation Layer -->
+<div class="absolute inset-0 z-0">
+
+</div>
+<!-- Content Overlay Layer -->
+<div class="relative z-10 w-full max-w-[1440px] px-container-padding h-full flex flex-col justify-between py-12 pointer-events-none">
+<!-- Header Section -->
+<header class="flex flex-col gap-2 mt-8 md:mt-0">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-[0.2em]">Stage V: Financial Architecture Analysis</span>
+<h1 class="font-display-lg-mobile md:font-display-lg text-primary">Structural Growth</h1>
+</header>
+<!-- Middle Section: Data & Legend (Responsive Layout) -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end w-full mt-auto mb-16 gap-8">
+<!-- Data Metrics -->
+<div class="flex flex-col md:flex-row gap-6 w-full md:w-auto">
+<!-- Metric 1 -->
+<div class="glass-panel p-6 rounded-xl flex flex-col gap-2 min-w-[200px] pointer-events-auto">
+<span class="font-label-caps text-label-caps text-outline uppercase">Revenue</span>
+<div class="flex items-baseline gap-2">
+<span class="font-mono-data text-mono-data text-2xl md:text-3xl text-primary">+$84B</span>
+<span class="font-mono-data text-mono-data text-xs text-[#a1f1b6] bg-[#a1f1b6]/10 px-2 py-1 rounded">(YoY +18%)</span>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="glass-panel p-6 rounded-xl flex flex-col gap-2 min-w-[200px] pointer-events-auto">
+<span class="font-label-caps text-label-caps text-outline uppercase">Free Cash Flow</span>
+<span class="font-mono-data text-mono-data text-2xl md:text-3xl text-primary">$22.4B</span>
+</div>
+<!-- Metric 3 -->
+<div class="glass-panel p-6 rounded-xl flex flex-col gap-2 min-w-[200px] pointer-events-auto">
+<span class="font-label-caps text-label-caps text-outline uppercase">Operating Margin</span>
+<span class="font-mono-data text-mono-data text-2xl md:text-3xl text-primary">34.2%</span>
+</div>
+</div>
+<!-- Legend -->
+<div class="flex flex-col gap-3 font-mono-data text-mono-data text-xs text-outline pointer-events-auto">
+<div class="flex items-center gap-3"><div class="w-2 h-2 bg-primary rounded-full"></div> Revenue Tower</div>
+<div class="flex items-center gap-3"><div class="w-2 h-2 bg-primary-fixed-dim rounded-full opacity-80"></div> Earnings Plinth</div>
+<div class="flex items-center gap-3"><div class="w-2 h-2 bg-outline rounded-full opacity-60"></div> FCF Core</div>
+<div class="flex items-center gap-3"><div class="w-2 h-2 bg-surface-variant border border-white/20 rounded-full"></div> Net Income Shell</div>
+</div>
+</div>
+<!-- Narrative Synthesis Panel -->
+<div class="w-full max-w-2xl glass-panel p-6 rounded-xl border-l-4 border-l-primary pointer-events-auto mt-4">
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    The architectural height of NVIDIA's revenue towers reflects a sustainable expansion of the data center segment, outstripping debt obligations by a factor of 4.2x.
+                </p>
+</div>
+</div>
+</main>
+</body></html>

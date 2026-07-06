@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AlphaLens | See What The Market Doesn't</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Newsreader:opsz,wght@6..72,300;6..72,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#45464e",
+                        "on-secondary": "#2f3037",
+                        "primary-fixed": "#e2e2e2",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "outline": "#8e9192",
+                        "surface-variant": "#353434",
+                        "on-surface": "#e5e2e1",
+                        "on-secondary-fixed-variant": "#45464e",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface": "#141313",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "surface-container": "#201f1f",
+                        "on-error": "#690005",
+                        "surface-bright": "#3a3939",
+                        "surface-tint": "#c6c6c7",
+                        "on-secondary-fixed": "#1a1b22",
+                        "secondary-fixed-dim": "#c6c6cf",
+                        "surface-dim": "#141313",
+                        "outline-variant": "#444748",
+                        "surface-container-low": "#1c1b1b",
+                        "on-primary-fixed-variant": "#454747",
+                        "on-surface-variant": "#c4c7c8",
+                        "inverse-on-surface": "#313030",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary-container": "#e2e2e2",
+                        "error": "#ffb4ab",
+                        "background": "#141313",
+                        "on-secondary-container": "#b4b4bd",
+                        "primary-container": "#e2e2e2",
+                        "primary": "#ffffff",
+                        "tertiary": "#ffffff",
+                        "error-container": "#93000a",
+                        "on-primary": "#2f3131",
+                        "on-background": "#e5e2e1",
+                        "on-primary-fixed": "#1a1c1c",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "inverse-primary": "#5d5f5f",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-container": "#636565",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "surface-container-highest": "#353434",
+                        "on-tertiary-container": "#636565",
+                        "secondary": "#c6c6cf",
+                        "secondary-fixed": "#e2e1eb",
+                        "on-tertiary": "#2f3131"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "section-gap": "128px",
+                        "safe-area-mobile": "20px",
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "container-padding": "64px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "display-lg-mobile": ["Newsreader"],
+                        "headline-md": ["Newsreader"],
+                        "display-lg": ["Newsreader"],
+                        "label-caps": ["Geist"],
+                        "mono-data": ["Geist"]
+                    },
+                    "fontSize": {
+                        "body-md": ["15px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "fontWeight": "300" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "400" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "mono-data": ["14px", { "lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "500" }]
+                    },
+                    "animation": {
+                        'fade-in-up': 'fadeInUp 1s ease-out forwards',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    "keyframes": {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+        .text-glow {
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        .delay-400 { animation-delay: 400ms; }
+        .delay-500 { animation-delay: 500ms; }
+        
+        /* Command Palette Input Reset */
+        input[type="text"]:focus {
+            outline: none;
+            box-shadow: none;
+            border-bottom-color: #ffffff;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md overflow-x-hidden selection:bg-primary/20 selection:text-primary">
+<!-- Background Layers -->
+<div class="fixed inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen">
+<!-- STITCH_SHADER_START:ANIMATION_3 class="absolute inset-0 w-full h-full" -->
+<div class="absolute inset-0 w-full h-full" style="display:block;">
+<canvas id="shader-canvas-ANIMATION_3" style="display:block;width:100%;height:100%"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('shader-canvas-ANIMATION_3');
+
+  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+  // This fires on initial layout and whenever the element is resized.
+  function syncSize() {
+    const w = canvas.clientWidth  || 1280;
+    const h = canvas.clientHeight || 720;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width  = w;
+      canvas.height = h;
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+  const fs = `precision highp float;
+varying vec2 v_texCoord;
+uniform float u_time;
+uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+
+// Noise functions for organic movement
+vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+float snoise(vec2 v) {
+    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+    vec2 i  = floor(v + dot(v, C.yy) );
+    vec2 x0 = v -   i + dot(i, C.xx);
+    vec2 i1;
+    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+    vec4 x12 = x0.xyxy + C.xxzz;
+    x12.xy -= i1;
+    i = mod289(i);
+    vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+    m = m*m ;
+    m = m*m ;
+    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+    vec3 h = abs(x) - 0.5;
+    vec3 a0 = x - floor(x + 0.5);
+    vec3 g = a0 * vec3(x0.x,x12.xz) + h * vec3(x0.y,x12.yw);
+    return 130.0 * dot(m, g);
+}
+
+void main() {
+    vec2 uv = (v_texCoord * 2.0 - 1.0) * (u_resolution.y / u_resolution.x);
+    float d = length(uv);
+    
+    // Core glow
+    float glow = 0.05 / pow(d, 1.2);
+    
+    // Organic noise layers
+    float n = snoise(uv * 1.5 + u_time * 0.2);
+    n += 0.5 * snoise(uv * 3.0 - u_time * 0.4);
+    
+    // Pulse based on time
+    float pulse = sin(u_time * 0.5) * 0.1 + 0.9;
+    
+    // Atmosphere
+    vec3 color = vec3(1.0); // Pure white/silver base
+    float alpha = smoothstep(0.8, 0.2, d * pulse + n * 0.1);
+    
+    // Edge highlight
+    float edge = smoothstep(0.48, 0.5, d) * smoothstep(0.52, 0.5, d);
+    
+    vec3 finalColor = color * (glow + alpha * 0.3 + edge * 0.8);
+    
+    // Mouse interaction
+    float mouseDist = length(uv - (u_mouse/u_resolution * 2.0 - 1.0));
+    finalColor += color * (0.1 / pow(mouseDist + 0.5, 2.0)) * 0.5;
+
+    gl_FragColor = vec4(finalColor, alpha * 0.8);
+}
+`;
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+  // Shaders that need normalized coords should use: u_mouse / u_resolution.
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  render(0);
+})();
+</script>
+</div>
+<!-- STITCH_SHADER_END:ANIMATION_3 -->
+</div>
+<div class="fixed inset-0 z-0 pointer-events-none flex items-center justify-center opacity-80 mix-blend-screen">
+<!-- STITCH_THREEJS_START:ANIMATION_4 class="absolute inset-0 w-full h-full transform scale-150" -->
+<div class="absolute inset-0 w-full h-full transform scale-150" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_4" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_4');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  // AlphaLens 3D Environment - Cinematic Sphere & Particle System
+const width = container.clientWidth || window.innerWidth;
+const height = container.clientHeight || window.innerHeight;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+renderer.setSize(width, height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+container.appendChild(renderer.domElement);
+
+// Central Intelligence Sphere (Wireframe/Geometric)
+const geometry = new THREE.IcosahedronGeometry(2, 4);
+const material = new THREE.MeshPhongMaterial({
+    color: 0xffffff,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.1,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.2
+});
+const sphere = new THREE.Mesh(geometry, material);
+scene.add(sphere);
+
+// Inner Core Glow (Point Light)
+const light = new THREE.PointLight(0xffffff, 2, 10);
+light.position.set(0, 0, 0);
+scene.add(light);
+
+// Floating Particles (News Events/Sentiment)
+const particlesCount = 200;
+const positions = new Float32Array(particlesCount * 3);
+for (let i = 0; i < particlesCount; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 10;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+}
+const particlesGeometry = new THREE.BufferGeometry();
+particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+const particlesMaterial = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 0.02,
+    transparent: true,
+    opacity: 0.5
+});
+const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+scene.add(particles);
+
+// Orbits (Financial Metrics)
+const createOrbit = (radius, speed, color) => {
+    const orbitGeo = new THREE.RingGeometry(radius, radius + 0.01, 64);
+    const orbitMat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
+    const orbit = new THREE.Mesh(orbitGeo, orbitMat);
+    orbit.rotation.x = Math.PI / 2;
+    orbit.rotation.y = Math.random() * Math.PI;
+    
+    // Add a small pulse node on the orbit
+    const nodeGeo = new THREE.SphereGeometry(0.05, 16, 16);
+    const nodeMat = new THREE.MeshBasicMaterial({ color: color });
+    const node = new THREE.Mesh(nodeGeo, nodeMat);
+    
+    const group = new THREE.Group();
+    group.add(orbit);
+    group.add(node);
+    node.position.x = radius;
+    
+    return { group, speed, radius };
+};
+
+const orbits = [
+    createOrbit(2.5, 0.01, 0xffffff),
+    createOrbit(3.2, -0.007, 0xcccccc),
+    createOrbit(4.0, 0.005, 0xffffff)
+];
+orbits.forEach(o => scene.add(o.group));
+
+// Lights
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(5, 5, 5);
+scene.add(directionalLight);
+
+// Animation
+let time = 0;
+const animate = () => {
+    requestAnimationFrame(animate);
+    time += 0.01;
+    
+    sphere.rotation.y += 0.002;
+    sphere.rotation.x += 0.001;
+    
+    particles.rotation.y -= 0.0005;
+    
+    orbits.forEach(o => {
+        o.group.rotation.y += o.speed;
+        o.group.children[1].position.x = Math.cos(time * o.speed * 50) * o.radius;
+        o.group.children[1].position.z = Math.sin(time * o.speed * 50) * o.radius;
+    });
+
+    renderer.render(scene, camera);
+};
+
+// Handle Resize
+window.addEventListener('resize', () => {
+    const w = container.clientWidth || window.innerWidth;
+    const h = container.clientHeight || window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+});
+
+animate();
+
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_4 -->
+</div>
+<!-- Radial Gradient Overlay for focus -->
+<div class="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#141313_100%)]"></div>
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-container-padding h-20 bg-surface/15 backdrop-blur-32 border-b border-white/10 hidden md:flex">
+<!-- Brand -->
+<div class="font-headline-md text-headline-md text-primary tracking-tighter flex items-center gap-2">
+            AlphaLens
+        </div>
+<!-- Links -->
+<div class="flex gap-8 items-center h-full">
+<a class="h-full flex items-center text-primary border-b-2 border-primary pb-1 opacity-80 scale-95 transition-transform font-label-caps text-label-caps uppercase" href="#">Intelligence</a>
+<a class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary hover:border-white/20 transition-all duration-300" href="#">Ecosystem</a>
+<a class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary hover:border-white/20 transition-all duration-300" href="#">Financials</a>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-6">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center">
+<span class="material-symbols-outlined font-light">menu</span>
+</button>
+<button class="font-label-caps text-label-caps uppercase border-[0.5px] border-white/20 px-6 py-2.5 rounded hover:border-white hover:bg-white/10 transition-all duration-300 tracking-[0.1em]">
+                Connect
+            </button>
+</div>
+</nav>
+<!-- Mobile Header -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-20 bg-surface/15 backdrop-blur-32 border-b border-white/10 md:hidden">
+<div class="font-display-lg-mobile text-display-lg-mobile tracking-tighter text-primary">
+            AlphaLens
+        </div>
+<button class="text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</nav>
+<!-- Main Content Canvas -->
+<main class="relative z-10 min-h-screen flex flex-col justify-center items-center px-6 md:px-container-padding pt-32 pb-24">
+<!-- Hero Section -->
+<div class="max-w-4xl w-full mx-auto text-center flex flex-col items-center mt-12 md:mt-0">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-6 animate-fade-in-up text-glow">
+                See What The Market Doesn't.
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-12 animate-fade-in-up delay-100 opacity-0 tracking-wide font-light">
+                AI-powered investment research that analyzes companies, identifies opportunities, surfaces risks, and explains every decision.
+            </p>
+<!-- Command Palette Style Search -->
+<div class="w-full max-w-2xl animate-fade-in-up delay-200 opacity-0 mb-12">
+<div class="glass-panel rounded-lg p-2 flex items-center relative group">
+<span class="material-symbols-outlined text-on-surface-variant ml-4 mr-2 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-transparent border-none text-primary font-mono-data text-mono-data placeholder:text-on-surface-variant/50 h-12 focus:ring-0" placeholder="Enter company name..." type="text"/>
+<div class="absolute inset-0 rounded-lg border border-white/0 group-focus-within:border-white/30 transition-colors pointer-events-none"></div>
+<!-- Right accessory -->
+<div class="mr-4 text-on-surface-variant/40 font-mono-data text-[10px] hidden sm:block">
+                        ⌘ K
+                    </div>
+</div>
+</div>
+<!-- Interactive Example Chips -->
+<div class="flex flex-wrap justify-center gap-3 animate-fade-in-up delay-300 opacity-0 mb-16">
+<span class="text-on-surface-variant/60 font-label-caps text-[10px] uppercase tracking-widest mr-2 flex items-center">Trending</span>
+<button class="px-4 py-1.5 rounded-full border border-white/10 text-on-surface text-label-caps font-label-caps hover:bg-white/5 hover:border-white/30 transition-all uppercase">NVIDIA</button>
+<button class="px-4 py-1.5 rounded-full border border-white/10 text-on-surface text-label-caps font-label-caps hover:bg-white/5 hover:border-white/30 transition-all uppercase">Microsoft</button>
+<button class="px-4 py-1.5 rounded-full border border-white/10 text-on-surface text-label-caps font-label-caps hover:bg-white/5 hover:border-white/30 transition-all uppercase">Apple</button>
+<button class="px-4 py-1.5 rounded-full border border-white/10 text-on-surface text-label-caps font-label-caps hover:bg-white/5 hover:border-white/30 transition-all uppercase hidden sm:block">Amazon</button>
+<button class="px-4 py-1.5 rounded-full border border-white/10 text-on-surface text-label-caps font-label-caps hover:bg-white/5 hover:border-white/30 transition-all uppercase hidden sm:block">Tesla</button>
+</div>
+<!-- CTAs -->
+<div class="flex flex-col sm:flex-row gap-6 animate-fade-in-up delay-400 opacity-0">
+<button class="bg-primary text-on-primary font-label-caps text-label-caps uppercase px-8 py-4 rounded hover:bg-primary/90 transition-colors tracking-widest">
+                    Analyze Company
+                </button>
+<button class="font-label-caps text-label-caps uppercase px-8 py-4 rounded border-[0.5px] border-white/20 text-primary hover:border-white hover:bg-white/5 transition-all tracking-widest">
+                    View Sample Research
+                </button>
+</div>
+<!-- Minimalist Scroll Indicator -->
+<div class="absolute bottom-12 left-1/2 -translate-x-1/2 animate-fade-in-up delay-500 opacity-0 flex flex-col items-center gap-2">
+<span class="font-label-caps text-[10px] text-on-surface-variant/50 uppercase tracking-widest">Scroll</span>
+<div class="w-[1px] h-12 bg-gradient-to-b from-white/20 to-transparent"></div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center h-20 bg-surface/80 backdrop-blur-32 md:hidden">
+<a class="flex flex-col items-center gap-1 text-primary opacity-80 scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<span class="font-label-caps text-[10px]">Intel</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined">hub</span>
+<span class="font-label-caps text-[10px]">Eco</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label-caps text-[10px]">Fin</span>
+</a>
+</nav>
+<script>
+        // Simple ambient cursor tracking for input glow
+        document.addEventListener('mousemove', (e) => {
+            const inputPanel = document.querySelector('.group-focus-within\\:border-white\\/30');
+            if(inputPanel && !document.querySelector('input:focus')) {
+                const rect = inputPanel.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Minimalist hover effect logic could go here to update CSS variables for a pseudo-element glow
+            }
+        });
+    </script>
+</body></html>
