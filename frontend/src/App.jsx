@@ -9,6 +9,8 @@ function App() {
   const [logs, setLogs] = useState([]);
   const [verdict, setVerdict] = useState(null);
   const [error, setError] = useState(null);
+  const [candidates, setCandidates] = useState(null);
+  const [rawDimensions, setRawDimensions] = useState({});
   const [view, setView] = useState('landing'); // 'landing' | 'reasoning' | 'dashboard'
 
   const handleSearch = (e) => {
@@ -17,6 +19,8 @@ function App() {
 
     setLogs([]);
     setVerdict(null);
+    setCandidates(null);
+    setRawDimensions({});
     setError(null);
     setIsSearching(true);
     setView('reasoning');
@@ -34,6 +38,25 @@ function App() {
       try {
         const data = JSON.parse(e.data);
         setVerdict(data);
+      } catch(err) { }
+    });
+
+    ['financials', 'news', 'competitors', 'risks'].forEach(dim => {
+      eventSource.addEventListener(`dimension_${dim}`, (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          setRawDimensions(prev => ({ ...prev, [dim]: data }));
+        } catch(err) { }
+      });
+    });
+
+    eventSource.addEventListener('ambiguous', (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        setCandidates(data.candidates);
+        setIsSearching(false);
+        setView('landing');
+        eventSource.close();
       } catch(err) { }
     });
 
@@ -68,9 +91,10 @@ function App() {
       {view === 'landing' && (
         <LandingView 
           query={query} 
-          setQuery={handleQueryChange} 
+          onQueryChange={handleQueryChange} 
+          onSearch={handleSearch} 
+          candidates={candidates}
           isSearching={isSearching} 
-          handleSearch={handleSearch} 
         />
       )}
       
@@ -79,7 +103,7 @@ function App() {
       )}
       
       {view === 'dashboard' && (
-        <DashboardView query={query} verdict={verdict} error={error} />
+        <DashboardView query={query} verdict={verdict} error={error} dimensions={rawDimensions} />
       )}
     </>
   );

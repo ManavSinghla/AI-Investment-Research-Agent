@@ -34,9 +34,17 @@ app.get("/api/research", async (req, res) => {
   try {
     sendEvent("progress", { message: `Started research for "${company}"...` });
     
-    // We can stream state updates from LangGraph using streamEvents or stream.
-    // We'll use stream() to get node-level updates.
-    const stream = await agent.stream({ query: company }, { streamMode: "updates" });
+    // We'll use stream() to get node-level updates, but also pass an onProgress callback 
+    // for immediate mid-superstep logging.
+    const config = {
+      configurable: {
+        onProgress: (msg, node) => {
+          sendEvent("progress", { message: msg, node });
+        }
+      }
+    };
+    
+    const stream = await agent.stream({ query: company }, { ...config, streamMode: "updates" });
 
     for await (const update of stream) {
       for (const [nodeName, nodeState] of Object.entries(update)) {
@@ -44,6 +52,19 @@ app.get("/api/research", async (req, res) => {
           nodeState.logs.forEach(log => {
             sendEvent("progress", { message: log, node: nodeName });
           });
+        }
+        
+        if (nodeName === "fetchFinancialsNode" && nodeState.financials) {
+          sendEvent("dimension_financials", nodeState.financials);
+        }
+        if (nodeName === "fetchNewsNode" && nodeState.news) {
+          sendEvent("dimension_news", nodeState.news);
+        }
+        if (nodeName === "fetchCompetitorsNode" && nodeState.competitors) {
+          sendEvent("dimension_competitors", nodeState.competitors);
+        }
+        if (nodeName === "fetchRisksNode" && nodeState.risks) {
+          sendEvent("dimension_risks", nodeState.risks);
         }
         
         if (nodeName === "decisionNode" && nodeState.verdict) {
@@ -55,8 +76,12 @@ app.get("/api/research", async (req, res) => {
     sendEvent("done", { message: "Research complete." });
     res.end();
   } catch (error) {
-    console.error("Agent error:", error);
-    sendEvent("error", { message: "An error occurred during research." });
+    if (error.message === "AMBIGUOUS_QUERY") {
+      sendEvent("ambiguous", { candidates: error.candidates });
+    } else {
+      console.error("Agent error:", error);
+      sendEvent("error", { message: error.message || "An error occurred during research." });
+    }
     res.end();
   }
 });

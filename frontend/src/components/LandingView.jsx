@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function LandingView({ query, setQuery, isSearching, handleSearch }) {
+export default function LandingView({ query, onQueryChange, isSearching, onSearch, candidates }) {
   return (
     <>
       <div className="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#141313_100%)]"></div>
@@ -31,7 +31,7 @@ export default function LandingView({ query, setQuery, isSearching, handleSearch
             AI-powered investment research that analyzes companies, identifies opportunities, surfaces risks, and explains every decision.
           </p>
           
-          <form onSubmit={handleSearch} className="w-full max-w-2xl animate-fade-in-up mb-12" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+          <form onSubmit={onSearch} className="w-full max-w-2xl animate-fade-in-up mb-12" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
             <div className="bg-white/5 backdrop-blur-32 border-[0.5px] border-white/10 rounded-lg p-2 flex items-center relative group">
               <span className="material-symbols-outlined text-on-surface-variant ml-4 mr-2 group-focus-within:text-primary transition-colors">search</span>
               <input 
@@ -39,7 +39,7 @@ export default function LandingView({ query, setQuery, isSearching, handleSearch
                 placeholder="Enter company name..." 
                 type="text"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => onQueryChange(e.target.value)}
                 disabled={isSearching}
               />
               <div className="absolute inset-0 rounded-lg border border-white/0 group-focus-within:border-white/30 transition-colors pointer-events-none"></div>
@@ -51,6 +51,29 @@ export default function LandingView({ query, setQuery, isSearching, handleSearch
                 Analyze
               </button>
             </div>
+            
+            {candidates && candidates.length > 0 && (
+              <div className="mt-8 bg-white/5 border border-primary/30 p-6 rounded-lg text-left animate-fade-in-up">
+                <h3 className="text-primary font-label-caps mb-4">Multiple Companies Found. Please Select:</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {candidates.map((c, idx) => (
+                    <button 
+                      key={idx}
+                      type="button"
+                      onClick={() => {
+                        onQueryChange(c.ticker || c.name);
+                        // Using timeout to ensure state updates before submitting
+                        setTimeout(() => onSearch({ preventDefault: () => {} }), 50);
+                      }}
+                      className="bg-background/50 hover:bg-white/10 border border-white/10 p-4 rounded text-left transition-colors"
+                    >
+                      <div className="text-white font-headline-md">{c.name}</div>
+                      <div className="text-on-surface-variant text-sm mt-1">{c.ticker ? `Ticker: ${c.ticker}` : 'Private / No Ticker'}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </form>
 
           <div className="flex flex-wrap justify-center gap-3 animate-fade-in-up mb-16" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
@@ -58,7 +81,7 @@ export default function LandingView({ query, setQuery, isSearching, handleSearch
             {['NVIDIA', 'Microsoft', 'Apple', 'Amazon', 'Tesla'].map(company => (
               <button 
                 key={company} 
-                onClick={() => setQuery(company)}
+                onClick={() => onQueryChange(company)}
                 className="px-4 py-1.5 rounded-full border border-white/10 text-on-surface text-label-caps font-label-caps hover:bg-white/5 hover:border-white/30 transition-all uppercase"
               >
                 {company}

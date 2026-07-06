@@ -1,5 +1,5 @@
 import { StateGraph, START, END, Annotation } from "@langchain/langgraph";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatGroq } from "@langchain/groq";
 import { fetchFinancials, searchDuckDuckGo } from "./tools.js";
 import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 import dotenv from "dotenv";
@@ -26,30 +26,62 @@ export const GraphState = Annotation.Root({
 });
 
 const getModel = () => {
-  return new ChatGoogleGenerativeAI({
-    model: "gemini-flash-latest",
-    maxOutputTokens: 2048,
-    apiKey: process.env.GOOGLE_GENAI_API_KEY || process.env.GOOGLE_API_KEY,
+  return new ChatGroq({
+    model: "llama-3.1-8b-instant",
+    maxRetries: 0,
+    apiKey: process.env.GROQ_API_KEY || process.env.GOOGLE_GENAI_API_KEY || process.env.GOOGLE_API_KEY,
   });
 };
 
-async function disambiguateNode(state) {
+async function invokeWithRetry(model, messages, maxRetries = 2) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await model.invoke(messages);
+    } catch (error) {
+      const msg = error.message || error.toString();
+      if ((msg.includes('429') || msg.includes('RateLimit') || msg.includes('Quota')) && i < maxRetries - 1) {
+        console.warn(`[Rate Limit] Retrying LLM call in ${2000 * (i + 1)}ms...`);
+        await new Promise(resolve => setTimeout(resolve, 2000 * (i + 1)));
+      } else {
+        throw error;
+      }
+    }
+  }
+}
+
+async function disambiguateNode(state, config) {
+  config?.configurable?.onProgress?.(`Resolving company ticker for "${state.query}"...`, "disambiguateNode");
   const model = getModel();
   const prompt = `You are a financial researcher. The user asked to research: "${state.query}".
-Return a JSON object with:
-"ticker": the stock ticker (if public, else null)
-"name": the official company name
-"sector": the company's primary sector.
-Example output: {"ticker": "AAPL", "name": "Apple Inc.", "sector": "Technology"}
-If the company is completely unknown, do your best guess or return null for ticker. ONLY return JSON.`;
+If the query is highly ambiguous (e.g. "Delta" could be Delta Airlines or Delta Faucet) or maps to multiple distinct public companies, return a JSON object with:
+"isAmbiguous": true,
+"candidates": [{"ticker": "DAL", "name": "Delta Air Lines, Inc."}, {"ticker": "DLTA", "name": "Delta Apparel"}]
 
-  const res = await model.invoke([new HumanMessage(prompt)]);
+If the query clearly refers to one specific company, return:
+"isAmbiguous": false,
+"ticker": the stock ticker (if public, else null),
+"name": the official company name,
+"sector": the company's primary sector.
+
+ONLY return JSON.`;
+
+  const res = await invokeWithRetry(model, [
+    new SystemMessage("You output strict JSON without markdown formatting."),
+    new HumanMessage(prompt)
+  ]);
+  
   let companyInfo = {};
   try {
     const jsonStr = res.content.replace(/```json/g, '').replace(/```/g, '').trim();
     companyInfo = JSON.parse(jsonStr);
   } catch(e) {
-    companyInfo = { name: state.query, ticker: null, sector: "Unknown" };
+    companyInfo = { name: state.query, ticker: null, sector: "Unknown", isAmbiguous: false };
+  }
+
+  if (companyInfo.isAmbiguous) {
+    const err = new Error("AMBIGUOUS_QUERY");
+    err.candidates = companyInfo.candidates;
+    throw err;
   }
 
   return {
@@ -58,14 +90,16 @@ If the company is completely unknown, do your best guess or return null for tick
   };
 }
 
-async function financialsNode(state) {
+async function financialsNode(state, config) {
   if (!state.companyInfo.ticker) {
+    config?.configurable?.onProgress?.("Skipping financials (no ticker).", "fetchFinancialsNode");
     return {
       financials: { success: false, error: "No ticker available" },
       logs: ["Skipping financials (no ticker)."]
     };
   }
   
+  config?.configurable?.onProgress?.(`Fetching financial data for ${state.companyInfo.ticker}...`, "fetchFinancialsNode");
   const result = await fetchFinancials(state.companyInfo.ticker);
   return {
     financials: result,
@@ -73,16 +107,40 @@ async function financialsNode(state) {
   };
 }
 
-async function newsNode(state) {
+async function newsNode(state, config) {
+  config?.configurable?.onProgress?.(`Fetching recent news and sentiment for ${state.companyInfo.name}...`, "fetchNewsNode");
+  const model = getModel();
   const query = `${state.companyInfo.name} recent news financial`;
   const result = await searchDuckDuckGo(query, 5);
+  
+  const prompt = `Based on the following recent news for ${state.companyInfo.name}:
+${JSON.stringify(result.data || [])}
+
+Analyze the overall market sentiment. Return a strict JSON object with:
+"score": A number from 0 to 100 where 0 is extremely negative, 50 is neutral, and 100 is extremely positive.
+"summary": A 1-2 sentence summary of the news sentiment.`;
+
+  const res = await invokeWithRetry(model, [
+    new SystemMessage("You output strict JSON without markdown formatting."),
+    new HumanMessage(prompt)
+  ]);
+  
+  let sentiment = { score: 50, summary: "Neutral sentiment due to lack of data." };
+  try {
+    const jsonStr = res.content.replace(/```json/g, '').replace(/```/g, '').trim();
+    sentiment = JSON.parse(jsonStr);
+  } catch(e) {
+    console.error("Failed to parse sentiment:", e);
+  }
+
   return {
-    news: result,
-    logs: [`Fetched recent news for ${state.companyInfo.name}.`]
+    news: { sentiment, sources: result.data },
+    logs: [`Analyzed recent news and sentiment for ${state.companyInfo.name}.`]
   };
 }
 
-async function competitorsNode(state) {
+async function competitorsNode(state, config) {
+  config?.configurable?.onProgress?.(`Analyzing competitors for ${state.companyInfo.name}...`, "fetchCompetitorsNode");
   const model = getModel();
   // First, search for competitors
   const query = `${state.companyInfo.name} main competitors market share`;
@@ -93,14 +151,15 @@ ${JSON.stringify(searchResult.data || [])}
 
 Summarize their competitive position in 2-3 sentences and list 2-3 main competitors.`;
 
-  const res = await model.invoke([new HumanMessage(prompt)]);
+  const res = await invokeWithRetry(model, [new HumanMessage(prompt)]);
   return {
     competitors: { summary: res.content, sources: searchResult.data },
     logs: [`Analyzed competitive position for ${state.companyInfo.name}.`]
   };
 }
 
-async function risksNode(state) {
+async function risksNode(state, config) {
+  config?.configurable?.onProgress?.(`Scanning risk factors for ${state.companyInfo.name}...`, "fetchRisksNode");
   const model = getModel();
   const query = `${state.companyInfo.name} risk factors litigation regulatory financial`;
   const searchResult = await searchDuckDuckGo(query, 5);
@@ -110,14 +169,15 @@ ${JSON.stringify(searchResult.data || [])}
 
 Summarize the key risk factors (regulatory, financial, operational) in 2-3 sentences.`;
 
-  const res = await model.invoke([new HumanMessage(prompt)]);
+  const res = await invokeWithRetry(model, [new HumanMessage(prompt)]);
   return {
     risks: { summary: res.content, sources: searchResult.data },
     logs: [`Analyzed risk factors for ${state.companyInfo.name}.`]
   };
 }
 
-async function decisionNode(state) {
+async function decisionNode(state, config) {
+  config?.configurable?.onProgress?.(`Synthesizing final investment verdict for ${state.companyInfo.name}...`, "decisionNode");
   const model = getModel();
   const prompt = `You are an expert investment analyst. Based on the following research for ${state.companyInfo.name}:
 
@@ -145,7 +205,7 @@ Output a structured investment verdict strictly as a JSON object (do not include
 
 Important: Base your claims strictly on the provided data. Extract URLs from the news/competitors/risks search results for the "sources" array.`;
 
-  const res = await model.invoke([
+  const res = await invokeWithRetry(model, [
     new SystemMessage("You output strict JSON without markdown formatting."),
     new HumanMessage(prompt)
   ]);
