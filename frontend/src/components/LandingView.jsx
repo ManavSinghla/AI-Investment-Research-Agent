@@ -1,16 +1,6 @@
-import React, { useState } from 'react';
 import LensField from './LensField';
 
 export default function LandingView({ query, onQueryChange, isSearching, onSearch, candidates, history, onSelectHistory }) {
-  const [wallet, setWallet] = useState({ status: 'disconnected', address: '' });
-
-  const handleConnect = () => {
-    setWallet({ status: 'connecting', address: '' });
-    setTimeout(() => {
-      setWallet({ status: 'connected', address: '0x71C...8E5' });
-    }, 1000);
-  };
-
   return (
     <>
       <LensField className="fixed inset-0 z-0 w-full h-full pointer-events-none" />
@@ -20,42 +10,12 @@ export default function LandingView({ query, onQueryChange, isSearching, onSearc
         <div className="font-headline-md text-headline-md text-primary tracking-tighter flex items-center gap-2">
           AlphaLens
         </div>
-        <div className="flex items-center gap-6">
-          <button 
-            onClick={handleConnect}
-            disabled={wallet.status === 'connecting'}
-            className="font-label-caps text-label-caps uppercase border-[0.5px] border-white/20 px-6 py-2.5 rounded hover:border-white hover:bg-white/10 transition-all duration-300 tracking-[0.1em] flex items-center space-x-2"
-          >
-            {wallet.status === 'disconnected' && <span>Connect Wallet</span>}
-            {wallet.status === 'connecting' && <span>Connecting...</span>}
-            {wallet.status === 'connected' && (
-              <>
-                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
-                <span>{wallet.address}</span>
-              </>
-            )}
-          </button>
-        </div>
       </nav>
 
       <nav className="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-20 bg-surface/15 backdrop-blur-32 border-b border-white/10 md:hidden">
         <div className="font-display-lg-mobile text-display-lg-mobile tracking-tighter text-primary">
           AlphaLens
         </div>
-        <button 
-          onClick={handleConnect}
-          disabled={wallet.status === 'connecting'}
-          className="text-xs font-label-caps border border-white/15 px-3 py-1.5 rounded text-white flex items-center space-x-1"
-        >
-          {wallet.status === 'disconnected' && <span>Connect</span>}
-          {wallet.status === 'connecting' && <span>...</span>}
-          {wallet.status === 'connected' && (
-            <>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
-              <span>{wallet.address}</span>
-            </>
-          )}
-        </button>
       </nav>
 
       <main className="relative z-10 min-h-screen flex flex-col justify-center items-center px-6 md:px-container-padding pt-32 pb-24">
