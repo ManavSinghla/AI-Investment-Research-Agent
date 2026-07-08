@@ -33,7 +33,13 @@ function App() {
     setIsSearching(true);
     setView('reasoning');
 
-    const eventSource = new EventSource(`http://localhost:3001/api/research?company=${encodeURIComponent(query)}`);
+    const API_BASE = import.meta.env.VITE_API_URL || (
+      window.location.port === '5173' 
+        ? 'http://localhost:3001' 
+        : window.location.origin
+    );
+
+    const eventSource = new EventSource(`${API_BASE}/api/research?company=${encodeURIComponent(query)}`);
 
     eventSource.addEventListener('progress', (e) => {
       try {
