@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import LensField from './LensField';
 
 export default function LandingView({ query, onQueryChange, isSearching, onSearch, candidates, history, onSelectHistory }) {
   const [wallet, setWallet] = useState({ status: 'disconnected', address: '' });
@@ -12,6 +13,7 @@ export default function LandingView({ query, onQueryChange, isSearching, onSearc
 
   return (
     <>
+      <LensField className="fixed inset-0 z-0 w-full h-full pointer-events-none" />
       <div className="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#141313_100%)]"></div>
       
       <nav className="fixed top-0 w-full z-50 flex justify-between items-center px-container-padding h-20 bg-surface/15 backdrop-blur-32 border-b border-white/10 hidden md:flex">
