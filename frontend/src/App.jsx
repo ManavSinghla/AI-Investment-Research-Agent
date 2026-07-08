@@ -16,7 +16,7 @@ function App() {
     try {
       const saved = localStorage.getItem('alphalens_history');
       return saved ? JSON.parse(saved) : [];
-    } catch(e) {
+    } catch {
       return [];
     }
   });
@@ -39,7 +39,7 @@ function App() {
       try {
         const data = JSON.parse(e.data);
         setLogs((prev) => [...prev, data.message]);
-      } catch(err) { }
+      } catch {}
     });
 
     let currentVerdict = null;
@@ -50,7 +50,7 @@ function App() {
         const data = JSON.parse(e.data);
         currentVerdict = data;
         setVerdict(data);
-      } catch(err) { }
+      } catch {}
     });
 
     ['financials', 'news', 'competitors', 'risks'].forEach(dim => {
@@ -59,7 +59,7 @@ function App() {
           const data = JSON.parse(e.data);
           currentDimensions[dim] = data;
           setRawDimensions(prev => ({ ...prev, [dim]: data }));
-        } catch(err) { }
+        } catch {}
       });
     });
 
@@ -70,10 +70,10 @@ function App() {
         setIsSearching(false);
         setView('landing');
         eventSource.close();
-      } catch(err) { }
+      } catch {}
     });
 
-    eventSource.addEventListener('done', (e) => {
+    eventSource.addEventListener('done', () => {
       if (currentVerdict) {
         setHistory(prev => {
           // Remove if query already exists to move it to the top
@@ -92,7 +92,7 @@ function App() {
       try {
         const data = JSON.parse(e.data);
         setError(data.message || "An error occurred.");
-      } catch (err) {
+      } catch {
         setError("An error occurred connecting to the server.");
       }
       setIsSearching(false);

@@ -26,29 +26,12 @@ export const GraphState = Annotation.Root({
   }),
 });
 
-const getModel = () => {
-  return new ChatGroq({
-    model: "llama-3.1-8b-instant",
-    maxRetries: 0,
-    apiKey: process.env.GROQ_API_KEY || process.env.GOOGLE_GENAI_API_KEY || process.env.GOOGLE_API_KEY,
-  });
-};
-
-async function invokeWithRetry(model, messages, maxRetries = 2) {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await model.invoke(messages);
-    } catch (error) {
-      const msg = error.message || error.toString();
-      if ((msg.includes('429') || msg.includes('RateLimit') || msg.includes('Quota')) && i < maxRetries - 1) {
-        console.warn(`[Rate Limit] Retrying LLM call in ${2000 * (i + 1)}ms...`);
-        await new Promise(resolve => setTimeout(resolve, 2000 * (i + 1)));
-      } else {
-        throw error;
-      }
-    }
-  }
-}
+// ponytail: use built-in maxRetries instead of custom loop
+const getModel = () => new ChatGroq({
+  model: "llama-3.1-8b-instant",
+  maxRetries: 2,
+  apiKey: process.env.GROQ_API_KEY || process.env.GOOGLE_GENAI_API_KEY || process.env.GOOGLE_API_KEY,
+});
 
 async function disambiguateNode(state, config) {
   config?.configurable?.onProgress?.(`Resolving company ticker for "${state.query}"...`, "disambiguateNode");
@@ -66,7 +49,7 @@ If the query clearly refers to one specific company, return:
 
 ONLY return JSON.`;
 
-  const res = await invokeWithRetry(model, [
+  const res = await model.invoke([
     new SystemMessage("You output strict JSON without markdown formatting."),
     new HumanMessage(prompt)
   ]);
@@ -135,7 +118,7 @@ Analyze the overall market sentiment. Return a strict JSON object with:
 "score": A number from 0 to 100 where 0 is extremely negative, 50 is neutral, and 100 is extremely positive.
 "summary": A 1-2 sentence summary of the news sentiment.`;
 
-  const res = await invokeWithRetry(model, [
+  const res = await model.invoke([
     new SystemMessage("You output strict JSON without markdown formatting."),
     new HumanMessage(prompt)
   ]);
@@ -169,7 +152,7 @@ ${JSON.stringify(searchResult.data)}
 Summarize their competitive position in 2-3 sentences and list 2-3 main competitors.`
     : `Using your general knowledge about ${state.companyInfo.name} (sector: ${state.companyInfo.sector || 'Unknown'}), summarize their competitive position in the industry in 2-3 sentences and list 2-3 of their primary competitors.`;
 
-  const res = await invokeWithRetry(model, [new HumanMessage(prompt)]);
+  const res = await model.invoke([new HumanMessage(prompt)]);
   return {
     competitors: { summary: res.content, sources: dataExists ? searchResult.data : [] },
     logs: [`Analyzed competitive position for ${state.companyInfo.name}.`]
@@ -191,7 +174,7 @@ ${JSON.stringify(searchResult.data)}
 Summarize the key risk factors (regulatory, financial, operational) in 2-3 sentences.`
     : `Using your general knowledge about ${state.companyInfo.name}, summarize their key risk factors (regulatory, financial, operational) in 2-3 sentences.`;
 
-  const res = await invokeWithRetry(model, [new HumanMessage(prompt)]);
+  const res = await model.invoke([new HumanMessage(prompt)]);
   return {
     risks: { summary: res.content, sources: dataExists ? searchResult.data : [] },
     logs: [`Analyzed risk factors for ${state.companyInfo.name}.`]
@@ -227,7 +210,7 @@ Output a structured investment verdict strictly as a JSON object (do not include
 
 Important: Base your claims strictly on the provided data. Extract URLs from the news/competitors/risks search results for the "sources" array.`;
 
-  const res = await invokeWithRetry(model, [
+  const res = await model.invoke([
     new SystemMessage("You output strict JSON without markdown formatting."),
     new HumanMessage(prompt)
   ]);
