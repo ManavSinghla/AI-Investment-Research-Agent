@@ -1,4 +1,5 @@
 import React from 'react';
+import Loader from './Loader';
 
 export default function ReasoningView({ logs }) {
   // Take up to the last 4 logs
@@ -64,6 +65,9 @@ export default function ReasoningView({ logs }) {
                 );
               })}
             </div>
+          </div>
+          <div className="col-span-1 md:col-span-8 flex items-center justify-center pb-24">
+            <Loader />
           </div>
         </div>
 

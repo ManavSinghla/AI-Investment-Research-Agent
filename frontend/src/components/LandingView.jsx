@@ -1,4 +1,6 @@
 import LensField from './LensField';
+import SearchInput from './search';
+import Loader from './Loader';
 
 export default function LandingView({ query, onQueryChange, isSearching, onSearch, candidates, history, onSelectHistory }) {
   return (
@@ -27,29 +29,17 @@ export default function LandingView({ query, onQueryChange, isSearching, onSearc
             AI-powered investment research that analyzes companies, identifies opportunities, surfaces risks, and explains every decision.
           </p>
           
-          <form onSubmit={onSearch} className="w-full max-w-2xl animate-fade-in-up mb-12" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
-            <div className="bg-white/5 backdrop-blur-32 border-[0.5px] border-white/10 rounded-lg p-2 flex items-center relative group">
-              <span className="material-symbols-outlined text-on-surface-variant ml-4 mr-2 group-focus-within:text-primary transition-colors">search</span>
-              <input 
-                className="w-full bg-transparent border-none text-primary font-mono-data text-mono-data placeholder:text-on-surface-variant/50 h-12 focus:ring-0 outline-none" 
-                placeholder="Enter company name..." 
-                type="text"
-                value={query}
-                onChange={(e) => onQueryChange(e.target.value)}
-                disabled={isSearching}
-              />
-              <div className="absolute inset-0 rounded-lg border border-white/0 group-focus-within:border-white/30 transition-colors pointer-events-none"></div>
-              <button
-                type="submit"
-                disabled={isSearching || !query.trim()}
-                className="mr-2 text-on-primary bg-primary px-4 py-2 rounded font-label-caps uppercase text-[10px] tracking-widest hover:bg-primary/90 transition-colors disabled:opacity-50"
-              >
-                Analyze
-              </button>
-            </div>
+          <form onSubmit={onSearch} className="w-full max-w-2xl animate-fade-in-up mb-12 flex flex-col items-center justify-center" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+            <SearchInput 
+              value={query}
+              onChange={(e) => onQueryChange(e.target.value)}
+              disabled={isSearching}
+              isSearching={isSearching}
+              placeholder="Enter company name..."
+            />
             
-            {candidates && candidates.length > 0 && (
-              <div className="mt-8 bg-white/5 border border-primary/30 p-6 rounded-lg text-left animate-fade-in-up">
+            {candidates && candidates.length > 0 && !isSearching && (
+              <div className="mt-8 bg-white/5 border border-primary/30 p-6 rounded-lg text-left animate-fade-in-up w-full">
                 <h3 className="text-primary font-label-caps mb-4">Multiple Companies Found. Please Select:</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {candidates.map((c, idx) => (
