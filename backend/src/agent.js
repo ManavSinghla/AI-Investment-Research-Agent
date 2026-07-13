@@ -33,6 +33,97 @@ const getModel = () => new ChatGroq({
   apiKey: process.env.GROQ_API_KEY || process.env.GOOGLE_GENAI_API_KEY || process.env.GOOGLE_API_KEY,
 });
 
+// Fallback for financials node if Yahoo Finance is rate-limited (status 429) or fails
+async function fetchFinancialsFallback(companyName, ticker) {
+  const model = getModel();
+  const searchQuery = `${companyName} ${ticker ? `(${ticker})` : ""} stock price market cap P/E ratio revenue margins debt free cashflow key financial metrics`;
+  
+  let searchData = [];
+  try {
+    const searchRes = await searchDuckDuckGo(searchQuery, 6);
+    if (searchRes.success && searchRes.data?.length > 0) {
+      searchData = searchRes.data;
+    }
+  } catch (err) {
+    console.error("DuckDuckGo search failed in financials fallback:", err);
+  }
+
+  if (searchData.length === 0) {
+    return { success: false, error: "Search data for financials fallback was empty" };
+  }
+
+  const prompt = `Based on these recent search results for ${companyName}:
+${JSON.stringify(searchData)}
+
+Extract or estimate the key financial metrics for this company. Return a strict JSON object with this schema:
+{
+  "price": number (current stock price) or null,
+  "marketCap": number (total market capitalization in dollars) or null,
+  "trailingPE": number (trailing price-to-earnings ratio) or null,
+  "forwardPE": number (forward P/E ratio) or null,
+  "revenueGrowth": number (e.g. 0.15 for 15% YoY growth) or null,
+  "profitMargins": number (e.g. 0.22 for 22%) or null,
+  "operatingMargins": number (e.g. 0.30 for 30%) or null,
+  "grossMargins": number (e.g. 0.50 for 50%) or null,
+  "returnOnEquity": number (e.g. 0.18 for 18%) or null,
+  "earningsGrowth": number (e.g. 0.12 for 12%) or null,
+  "totalRevenue": number (in dollars) or null,
+  "totalDebt": number (in dollars) or null,
+  "debtToEquity": number (ratio as percentage or decimal) or null,
+  "freeCashflow": number (in dollars) or null,
+  "dividendYield": number (e.g. 0.015 for 1.5%) or null,
+  "fiftyTwoWeekHigh": number or null,
+  "fiftyTwoWeekLow": number or null,
+  "recommendationKey": string (e.g. "buy", "hold", "sell") or null,
+  "sector": string or null,
+  "industry": string or null,
+  "website": string or null,
+  "description": string (short company description) or null
+}
+
+Important: Base all values strictly on the search results. If a value is missing, set it to null. Convert large figures like "3.1T" or "45B" to full numbers (e.g. 3100000000000 or 45000000000). Convert percentages (e.g. 15%) to decimals (0.15). Do not include any text other than the strict JSON.`;
+
+  try {
+    const res = await model.invoke([
+      new SystemMessage("You output strict JSON without markdown formatting."),
+      new HumanMessage(prompt)
+    ]);
+    
+    const jsonStr = res.content.replace(/```json/g, '').replace(/```/g, '').trim();
+    const data = JSON.parse(jsonStr);
+    
+    return {
+      success: true,
+      data: {
+        price: data.price ?? null,
+        marketCap: data.marketCap ?? null,
+        trailingPE: data.trailingPE ?? null,
+        forwardPE: data.forwardPE ?? null,
+        revenueGrowth: data.revenueGrowth ?? null,
+        profitMargins: data.profitMargins ?? null,
+        operatingMargins: data.operatingMargins ?? null,
+        grossMargins: data.grossMargins ?? null,
+        returnOnEquity: data.returnOnEquity ?? null,
+        earningsGrowth: data.earningsGrowth ?? null,
+        totalRevenue: data.totalRevenue ?? null,
+        totalDebt: data.totalDebt ?? null,
+        debtToEquity: data.debtToEquity ?? null,
+        freeCashflow: data.freeCashflow ?? null,
+        dividendYield: data.dividendYield ?? null,
+        fiftyTwoWeekHigh: data.fiftyTwoWeekHigh ?? null,
+        fiftyTwoWeekLow: data.fiftyTwoWeekLow ?? null,
+        recommendationKey: data.recommendationKey ?? null,
+        sector: data.sector ?? "Unknown",
+        industry: data.industry ?? "Unknown",
+        website: data.website ?? null,
+        description: data.description ?? "No description available.",
+      }
+    };
+  } catch (err) {
+    return { success: false, error: `Fallback extraction failed: ${err.message}` };
+  }
+}
+
 async function disambiguateNode(state, config) {
   config?.configurable?.onProgress?.(`Resolving company ticker for "${state.query}"...`, "disambiguateNode");
   const model = getModel();
@@ -84,7 +175,22 @@ async function financialsNode(state, config) {
   }
   
   config?.configurable?.onProgress?.(`Fetching financial data for ${state.companyInfo.ticker}...`, "fetchFinancialsNode");
-  const result = await fetchFinancials(state.companyInfo.ticker);
+  let result = await fetchFinancials(state.companyInfo.ticker);
+  
+  if (!result.success) {
+    config?.configurable?.onProgress?.(`Yahoo Finance rate limited (429) or failed. Running search-based fallback...`, "fetchFinancialsNode");
+    try {
+      const fallbackResult = await fetchFinancialsFallback(state.companyInfo.name, state.companyInfo.ticker);
+      if (fallbackResult.success) {
+        result = fallbackResult;
+      } else {
+        config?.configurable?.onProgress?.(`Fallback also failed: ${fallbackResult.error}`, "fetchFinancialsNode");
+      }
+    } catch (err) {
+      console.error("Fallback financials failed:", err);
+    }
+  }
+
   return {
     financials: result,
     logs: [`Fetched financials for ${state.companyInfo.ticker}.`]
