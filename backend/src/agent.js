@@ -49,7 +49,72 @@ async function fetchFinancialsFallback(companyName, ticker) {
   }
 
   if (searchData.length === 0) {
-    return { success: false, error: "Search data for financials fallback was empty" };
+    const knowledgePrompt = `You are a financial researcher. The APIs for retrieving recent financials for ${companyName} (${ticker}) are currently rate-limited or down.
+Based on your internal knowledge, provide the key financial metrics for ${companyName} (${ticker}). If you are unsure of the exact current numbers, estimate them based on the latest historical data you have. Return a strict JSON object with this schema:
+{
+  "price": number (approximate recent stock price) or null,
+  "marketCap": number (approximate market capitalization in dollars) or null,
+  "trailingPE": number (approximate trailing P/E ratio) or null,
+  "forwardPE": number or null,
+  "revenueGrowth": number (e.g. 0.15 for 15% growth) or null,
+  "profitMargins": number (e.g. 0.22 for 22%) or null,
+  "operatingMargins": number or null,
+  "grossMargins": number or null,
+  "returnOnEquity": number or null,
+  "earningsGrowth": number or null,
+  "totalRevenue": number (in dollars) or null,
+  "totalDebt": number (in dollars) or null,
+  "debtToEquity": number or null,
+  "freeCashflow": number (in dollars) or null,
+  "dividendYield": number (e.g. 0.015 for 1.5%) or null,
+  "fiftyTwoWeekHigh": number or null,
+  "fiftyTwoWeekLow": number or null,
+  "recommendationKey": string ("buy", "hold", "sell") or null,
+  "sector": string or null,
+  "industry": string or null,
+  "website": string or null,
+  "description": string (approximate business description) or null
+}
+Return strict JSON only. Do not include markdown formatting or extra text.`;
+
+    try {
+      const res = await model.invoke([
+        new SystemMessage("You output strict JSON without markdown formatting."),
+        new HumanMessage(knowledgePrompt)
+      ]);
+      const jsonStr = res.content.replace(/```json/g, '').replace(/```/g, '').trim();
+      const data = JSON.parse(jsonStr);
+      
+      return {
+        success: true,
+        data: {
+          price: data.price ?? null,
+          marketCap: data.marketCap ?? null,
+          trailingPE: data.trailingPE ?? null,
+          forwardPE: data.forwardPE ?? null,
+          revenueGrowth: data.revenueGrowth ?? null,
+          profitMargins: data.profitMargins ?? null,
+          operatingMargins: data.operatingMargins ?? null,
+          grossMargins: data.grossMargins ?? null,
+          returnOnEquity: data.returnOnEquity ?? null,
+          earningsGrowth: data.earningsGrowth ?? null,
+          totalRevenue: data.totalRevenue ?? null,
+          totalDebt: data.totalDebt ?? null,
+          debtToEquity: data.debtToEquity ?? null,
+          freeCashflow: data.freeCashflow ?? null,
+          dividendYield: data.dividendYield ?? null,
+          fiftyTwoWeekHigh: data.fiftyTwoWeekHigh ?? null,
+          fiftyTwoWeekLow: data.fiftyTwoWeekLow ?? null,
+          recommendationKey: data.recommendationKey ?? null,
+          sector: data.sector ?? "Unknown",
+          industry: data.industry ?? "Unknown",
+          website: data.website ?? null,
+          description: (data.description ?? "") + "\n\n(Note: Financial data retrieved from AI Knowledge Base due to live API rate limits.)",
+        }
+      };
+    } catch (err) {
+      return { success: false, error: `AI Knowledge fallback extraction failed: ${err.message}` };
+    }
   }
 
   const prompt = `Based on these recent search results for ${companyName}:

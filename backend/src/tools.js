@@ -48,6 +48,8 @@ export async function fetchFinancials(ticker) {
 }
 
 export async function searchDuckDuckGo(query, numResults = 5) {
+  // Add a small randomized staggered delay (100ms - 900ms) to prevent bot detection from parallel graph requests
+  await new Promise(resolve => setTimeout(resolve, Math.random() * 800 + 100));
   try {
     const searchResults = await search(query);
     
