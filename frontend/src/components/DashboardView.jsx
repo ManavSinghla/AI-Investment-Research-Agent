@@ -185,7 +185,13 @@ export default function DashboardView({ query, verdict, error, dimensions = {}, 
 
           {activeTab === 'financials' && (
             <div className="space-y-8">
-              {dimensions.financials?.data ? (
+              {dimensions.financials?.success === false ? (
+                <div className="bg-white/5 border border-red-500/20 p-8 rounded-lg text-center max-w-xl mx-auto my-8">
+                  <span className="material-symbols-outlined text-[48px] text-red-400 mb-4">warning</span>
+                  <h4 className="font-label-caps text-red-400 mb-2">Financials Unavailable</h4>
+                  <p className="text-on-surface-variant text-sm">{dimensions.financials.error || "Financial data could not be retrieved for this company."}</p>
+                </div>
+              ) : dimensions.financials?.data ? (
                 <>
                   {/* Company Profile (DNA) Section */}
                   {(dimensions.financials.data.description || dimensions.financials.data.sector || dimensions.financials.data.industry) && (
@@ -263,7 +269,7 @@ export default function DashboardView({ query, verdict, error, dimensions = {}, 
                   </div>
                 </>
               ) : (
-                <div className="text-on-surface-variant">Loading or unavailable...</div>
+                <div className="text-on-surface-variant">Loading...</div>
               )}
             </div>
           )}

@@ -5,15 +5,16 @@ const yahooFinance = new YahooFinance();
 
 export async function fetchFinancials(ticker) {
   try {
-    const quote = await yahooFinance.quote(ticker);
-    const summaryDetail = await yahooFinance.quoteSummary(ticker, { 
+    const quote = (await yahooFinance.quote(ticker)) || {};
+    const quoteSummaryResult = await yahooFinance.quoteSummary(ticker, { 
       modules: ['summaryDetail', 'financialData', 'defaultKeyStatistics', 'summaryProfile'] 
     });
     
-    const financialData = summaryDetail.financialData || {};
-    const keyStats = summaryDetail.defaultKeyStatistics || {};
-    const profile = summaryDetail.summaryProfile || {};
-
+    const financialData = quoteSummaryResult.financialData || {};
+    const keyStats = quoteSummaryResult.defaultKeyStatistics || {};
+    const profile = quoteSummaryResult.summaryProfile || {};
+    const detail = quoteSummaryResult.summaryDetail || {};
+ 
     return {
       success: true,
       data: {
@@ -31,9 +32,9 @@ export async function fetchFinancials(ticker) {
         totalDebt: financialData.totalDebt,
         debtToEquity: financialData.debtToEquity,
         freeCashflow: financialData.freeCashflow,
-        dividendYield: summaryDetail.dividendYield,
-        fiftyTwoWeekHigh: summaryDetail.fiftyTwoWeekHigh,
-        fiftyTwoWeekLow: summaryDetail.fiftyTwoWeekLow,
+        dividendYield: detail.dividendYield,
+        fiftyTwoWeekHigh: detail.fiftyTwoWeekHigh,
+        fiftyTwoWeekLow: detail.fiftyTwoWeekLow,
         recommendationKey: financialData.recommendationKey,
         sector: profile.sector,
         industry: profile.industry,
